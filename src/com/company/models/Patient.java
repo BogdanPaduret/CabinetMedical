@@ -2,13 +2,13 @@ package com.company.models;
 
 import static com.company.helpers.Constants.*;
 
-public class Doctor extends User {
+public class Patient extends User {
 
     //instance variables
 
     //constructor
-    public Doctor(int userId, String name) {
-        super(USER_DOCTOR, userId, name);
+    public Patient(int userId, String name) {
+        super(USER_PATIENT, userId, name);
     }
 
     //implemented methods
@@ -16,15 +16,15 @@ public class Doctor extends User {
     public String toString() {
         String string = "";
 
-        string += "Doctor ID: " + this.getUserId() + "\n";
-        string += "Doctor Name: " + this.getName();
+        string += "Patient ID: " + getUserId() + "\n";
+        string += "Patient name: " + getName();
 
         return string;
     }
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof Doctor doctor) &&
+        return (o instanceof Patient patient) &&
                 super.equals(o);
     }
 

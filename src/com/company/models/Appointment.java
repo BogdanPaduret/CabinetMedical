@@ -1,17 +1,21 @@
 package com.company.models;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static com.company.helpers.Constants.STRING_SEPARATOR;
 
-public class Appointment {
+public class Appointment implements Serializable {
 
     //instance variables
     private int appointmentId;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private transient LocalDateTime startDate;
+    private transient LocalDateTime endDate;
 
     //constructor
     public Appointment(int appointmentId, String startDate,
@@ -54,10 +58,41 @@ public class Appointment {
         this.endDate = LocalDateTime.of(endYear, endMonth, endDay, endHour, endMinute);
 
     }
-    //create
 
+    //create
+    private void writeObject(ObjectOutputStream oos) throws IOException {
+        oos.defaultWriteObject();
+        //write ints of LocalDateTime for easy retrieval and localDateTime build
+        LocalDateTime[] dates = {startDate, endDate};
+        for (int i = 0; i < dates.length; i++) {
+            LocalDateTime date = dates[i];
+            oos.writeObject(date.getYear());
+            oos.writeObject(date.getMonthValue());
+            oos.writeObject(date.getDayOfMonth());
+            oos.writeObject(date.getHour());
+            oos.writeObject(date.getMinute());
+        }
+    }
 
     //read
+    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+        ois.defaultReadObject();
+        LocalDateTime[] dates = {startDate, endDate};
+//        for (int i = 0; i < dates.length; i++) {
+            int sYear = (int) ois.readObject();
+            int sMonth = (int) ois.readObject();
+            int sDay = (int) ois.readObject();
+            int sHour = (int) ois.readObject();
+            int sMinute = (int) ois.readObject();
+        int eYear = (int) ois.readObject();
+        int eMonth = (int) ois.readObject();
+        int eDay = (int) ois.readObject();
+        int eHour = (int) ois.readObject();
+        int eMinute = (int) ois.readObject();
+        startDate = LocalDateTime.of(sYear, sMonth, sDay, sHour, sMinute);
+        endDate = LocalDateTime.of(eYear, eMonth, eDay, eHour, eMinute);
+//        }
+    }
     public int getAppointmentId() {
         return appointmentId;
     }
@@ -70,6 +105,7 @@ public class Appointment {
     public Duration getDuration() {
         return Duration.between(startDate, endDate);
     }
+
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy HH:mm a");
@@ -99,6 +135,7 @@ public class Appointment {
 
         return string;
     }
+
     @Override
     public boolean equals(Object o) {
         return (o instanceof Appointment appointment) &&

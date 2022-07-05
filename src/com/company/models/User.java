@@ -1,44 +1,50 @@
 package com.company.models;
 
+import static com.company.helpers.Constants.SAVE_SEPARATOR;
+
 public abstract class User implements Comparable<User> {
 
     //instance variables
+    private String type;
     private int userId;
     private String name;
 
     //constructor
-    public User(int userId, String name) {
+    public User(String type, int userId, String name) {
+        this.type = type;
         this.userId = userId;
         this.name = name;
     }
 
     //read
+    public String getType() {
+        return type;
+    }
     public int getUserId() {
         return userId;
+    }
+    public String getName() {
+        return name;
+    }
+
+    //update
+    public void setType(String type) {
+        this.type = type;
+    }
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
     public void setName(String name) {
         this.name = name;
     }
 
-    //update
-    public String getName() {
-        return name;
-    }
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
     //implemented methods
     @Override
     public boolean equals(Object o) {
-        try {
-            User user = (User) o;
-            return this.getUserId() == user.getUserId() &&
-                    this.getName().equals(user.getName());
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            return false;
-        }
+        return (o instanceof User user) &&
+                this.getType().equals(user.getType()) &&
+                this.getUserId() == user.getUserId() &&
+                this.getName().equals(user.getName());
     }
     @Override
     public int compareTo(User o){
@@ -49,9 +55,13 @@ public abstract class User implements Comparable<User> {
 
         return thisId.compareTo(userId);
     }
-
-    //abstract methods
     @Override
-    public abstract String toString();
+    public String toString() {
+        String string = "";
+
+        string += getType() + SAVE_SEPARATOR + getUserId() + SAVE_SEPARATOR + getName();
+
+        return string;
+    }
 
 }
