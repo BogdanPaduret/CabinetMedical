@@ -9,7 +9,7 @@ import java.util.List;
 
 class UserRepositoryTest {
 
-    String path = "test/com/company/models/users";
+    String path = "test/com/company/repositories/users";
 
     @Test
     public void loadTest() {
