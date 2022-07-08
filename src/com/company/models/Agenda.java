@@ -56,7 +56,8 @@ public class Agenda {
 
     //helper methods
     private void matchDoctorsAppointments(UserRepository ur, AppointmentRepository ar) {
-        List<User> users = ur.getUsers();
+        List<User> users = new ArrayList<>();
+        users.addAll(ur.getUsers());
         Set<Appointment> appointments = null;
         for (int i = 0; i < users.size(); i++) {
             Doctor doctor = null;

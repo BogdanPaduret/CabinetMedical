@@ -17,7 +17,7 @@ class UserRepositoryTest {
 
         UserRepository users = new UserRepository(path);
 
-        doctors = users.getUsers();
+        doctors.addAll(users.getUsers());
 
         for (int i = 0; i < doctors.size(); i++) {
             System.out.println(doctors.get(i));

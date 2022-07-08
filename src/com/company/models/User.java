@@ -17,6 +17,13 @@ public abstract class User implements Comparable<User> {
     }
 
     //read
+    public String saveString() {
+        String string = "";
+
+        string += getType() + SAVE_SEPARATOR + getUserId() + SAVE_SEPARATOR + getName();
+
+        return string;
+    }
     public String getType() {
         return type;
     }
@@ -59,7 +66,9 @@ public abstract class User implements Comparable<User> {
     public String toString() {
         String string = "";
 
-        string += getType() + SAVE_SEPARATOR + getUserId() + SAVE_SEPARATOR + getName();
+        string += "User type: " + getType();
+        string += "\nUser ID: " + getUserId();
+        string += "\nUser Name: " + getName();
 
         return string;
     }

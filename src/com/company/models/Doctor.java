@@ -16,8 +16,8 @@ public class Doctor extends User {
     public String toString() {
         String string = "";
 
-        string += "Doctor ID: " + this.getUserId() + "\n";
-        string += "Doctor Name: " + this.getName();
+        string += "Doctor ID: " + this.getUserId();
+        string += "\nDoctor Name: " + this.getName();
 
         return string;
     }

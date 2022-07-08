@@ -5,24 +5,56 @@ import com.company.models.Patient;
 import com.company.models.User;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.*;
 
 import static com.company.helpers.Constants.*;
+import static com.company.helpers.Utils.checkType;
 
 public class UserRepository {
 
+    //instance variables
+    private TreeSet<User> users;
+    private String path;
 
-    private List<User> users;
-
-
+    //constructor
     public UserRepository(String path) {
-        this.users = new ArrayList<>();
-        this.load(path);
+        this.users = new TreeSet<>();
+        this.path = path;
+        this.load();
+    }
+    public UserRepository(String path, Collection<User> users) {
+        users = new TreeSet<>();
+        this.users.addAll(users);
+        this.path = path;
     }
 
-    private void load(String path) {
+    //create
+    public void save() {
+        try {
+            File file = new File(path);
+            FileWriter fileWriter = new FileWriter(file);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+
+            printWriter.print(toSave());
+            printWriter.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public boolean addUser(String type, String name) {
+        if (checkType(type)) {
+            users.add(createUser(type, name));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //read
+    private void load() {
         try {
             File file = new File(path);
             Scanner scanner = new Scanner(file);
@@ -43,6 +75,38 @@ public class UserRepository {
             e.printStackTrace();
         }
     }
+    public Set<User> getUsers() {
+        return users;
+    }
+    public boolean exists(int id, String name) {
+        for (User user : users) {
+            if (user.getUserId() == id && user.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public User getUserById(int id) throws NoSuchElementException{
+        for (User user : users) {
+            if (user.getUserId() == id) {
+                return user;
+            }
+        }
+        throw new NoSuchElementException();
+    }
+
+    //helpers
+    private String toSave() {
+        String string = "";
+
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            string += user.saveString() + "\n";
+        }
+
+        return string;
+    }
     private User createUser(String line) {
         String[] input = line.split(SAVE_SEPARATOR);
         String userType = input[0];
@@ -59,10 +123,22 @@ public class UserRepository {
         }
 
     }
-
-    public List<User> getUsers() {
-        return users;
+    private User createUser(String type, String name) {
+        int id = generateNewId();
+        return createUser(type, id, name);
     }
-
+    private User createUser(String type, int id, String name) {
+        switch (type) {
+            default:
+                return null;
+            case USER_DOCTOR:
+                return new Doctor(id, name);
+            case USER_PATIENT:
+                return new Patient(id, name);
+        }
+    }
+    private int generateNewId() {
+        return users.last().getUserId() + 1;
+    }
 
 }

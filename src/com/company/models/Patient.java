@@ -16,8 +16,8 @@ public class Patient extends User {
     public String toString() {
         String string = "";
 
-        string += "Patient ID: " + getUserId() + "\n";
-        string += "Patient name: " + getName();
+        string += "Patient ID: " + getUserId();
+        string += "\nPatient name: " + getName();
 
         return string;
     }
