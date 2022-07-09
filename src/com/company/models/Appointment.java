@@ -195,4 +195,12 @@ public class Appointment implements Serializable, Comparable<Appointment> {
         this.endDate = endDate;
     }
 
+    public void set(Appointment appointment) {
+        this.appointmentId = appointment.appointmentId;
+        this.doctorId = appointment.doctorId;
+        this.patientId = appointment.patientId;
+        this.startDate = appointment.startDate;
+        this.endDate = appointment.endDate;
+    }
+
 }

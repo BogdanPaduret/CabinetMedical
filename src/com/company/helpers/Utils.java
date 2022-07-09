@@ -8,7 +8,7 @@ import static com.company.helpers.Constants.USER_PATIENT;
 public abstract class Utils {
 
 
-    public static final UserRepository userRepository = new UserRepository("");
+//    public static final UserRepository userRepository = new UserRepository("");
 
     public static final boolean checkType(String type) {
         String[] types = {USER_DOCTOR, USER_PATIENT};

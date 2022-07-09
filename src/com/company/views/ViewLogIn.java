@@ -7,8 +7,6 @@ import com.company.repositories.UserRepository;
 
 import java.util.*;
 
-import static com.company.helpers.Constants.USER_DOCTOR;
-import static com.company.helpers.Constants.USER_PATIENT;
 import static com.company.helpers.Utils.checkType;
 
 public class ViewLogIn implements View {
@@ -23,7 +21,7 @@ public class ViewLogIn implements View {
     public ViewLogIn(String rootPath) {
         this.path = rootPath + "com/company/repositories/users";
         UserRepository userRepository = new UserRepository(path);
-        users.addAll(userRepository.getUsers());
+        users = userRepository.getAll();
 
         user = null;
     }
@@ -157,8 +155,9 @@ public class ViewLogIn implements View {
             System.out.println(abort);
         } else {
             String name = input[1];
-            UserRepository ur = new UserRepository(path);
+            UserRepository ur = new UserRepository(path,users);
             ur.addUser(type, name);
+            users = ur.getAll();
         }
 
     }

@@ -12,7 +12,7 @@ import java.util.*;
 import static com.company.helpers.Constants.*;
 import static com.company.helpers.Utils.checkType;
 
-public class UserRepository {
+public class UserRepository implements Repository<User>{
 
     //instance variables
     private TreeSet<User> users;
@@ -25,12 +25,13 @@ public class UserRepository {
         this.load();
     }
     public UserRepository(String path, Collection<User> users) {
-        users = new TreeSet<>();
+        this.users = new TreeSet<>();
         this.users.addAll(users);
         this.path = path;
     }
 
     //create
+    @Override
     public void save() {
         try {
             File file = new File(path);
@@ -44,6 +45,10 @@ public class UserRepository {
             e.printStackTrace();
         }
     }
+    @Override
+    public void add(User user) {
+        addUser(user.getType(), user.getName());
+    }
     public boolean addUser(String type, String name) {
         if (checkType(type)) {
             users.add(createUser(type, name));
@@ -54,7 +59,8 @@ public class UserRepository {
     }
 
     //read
-    private void load() {
+    @Override
+    public void load() {
         try {
             File file = new File(path);
             Scanner scanner = new Scanner(file);
@@ -75,7 +81,27 @@ public class UserRepository {
             e.printStackTrace();
         }
     }
-    public Set<User> getUsers() {
+    @Override
+    public int size() {
+        Iterator<User> iterator = users.iterator();
+        int c = 0;
+        while (iterator.hasNext()) {
+            c++;
+            iterator.next();
+        }
+        return c;
+    }
+    @Override
+    public User get(int id) throws NoSuchElementException{
+        for (User user : users) {
+            if (user.getUserId() == id) {
+                return user;
+            }
+        }
+        throw new NoSuchElementException();
+    }
+    @Override
+    public Set<User> getAll() {
         return users;
     }
     public boolean exists(int id, String name) {
@@ -86,13 +112,46 @@ public class UserRepository {
         }
         return false;
     }
-    public User getUserById(int id) throws NoSuchElementException{
-        for (User user : users) {
-            if (user.getUserId() == id) {
-                return user;
+    public String show() {
+        String string = "";
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            string += user.toString() + "\n";
+        }
+        return string;
+    }
+    public String getPath() {
+        return path;
+    }
+
+    //update
+    public void setPath(String path) {
+        this.path = path;
+    }
+    @Override
+    public void set(int id, User user) {
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User u = iterator.next();
+            if (u.getUserId() == id) {
+                u.set(user);
             }
         }
-        throw new NoSuchElementException();
+    }
+    @Override
+    public void addAll(Collection<User> users) {
+        this.users.addAll(users);
+    }
+
+    //delete
+    @Override
+    public void clear() {
+        users.clear();
+    }
+    @Override
+    public void remove(User user) {
+        users.remove(user);
     }
 
     //helpers

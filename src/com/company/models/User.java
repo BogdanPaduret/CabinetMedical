@@ -44,6 +44,11 @@ public abstract class User implements Comparable<User> {
     public void setName(String name) {
         this.name = name;
     }
+    public void set(User user) {
+        this.type = user.type;
+        this.userId = user.userId;
+        this.name = user.name;
+    }
 
     //implemented methods
     @Override

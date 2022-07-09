@@ -29,16 +29,18 @@ public class Agenda {
 
     //create
     public void addAppointment(Doctor doctor, Appointment appointment) {
-        Set<Appointment> appointments = appointmentMap.get(doctor);
+        if (appointmentMap.containsKey(doctor)) {
+            Set<Appointment> appointments = appointmentMap.get(doctor);
+            if (appointments == null) {
+                appointments = new TreeSet<>();
+            }
 
-        if (appointments == null) {
-            appointments = new TreeSet<>();
+            appointments.add(appointment);
+            refreshMap(doctor, appointments);
+
+        } else {
+            throw new NoSuchElementException("Doctor does not exist");
         }
-
-        appointments.add(appointment);
-        appointmentMap.remove(doctor);
-        appointmentMap.put(doctor, appointments);
-
     }
 
     //read
@@ -54,10 +56,47 @@ public class Agenda {
         return appointments;
     }
 
+    //update
+    public void updateAppointment(Doctor doctor, int appointmentId, Appointment appointment) {
+        if (appointmentMap.containsKey(doctor)) {
+            Set<Appointment> appointments = appointmentMap.get(doctor);
+            Iterator<Appointment> iterator = appointments.iterator();
+            while (iterator.hasNext()) {
+                Appointment a = iterator.next();
+                if (a.getAppointmentId() == appointmentId) {
+                    if (doctor.getUserId() == appointment.getDoctorId()) {
+                        a.set(appointment);
+                        refreshMap(doctor, appointments);
+                    } else {
+                        //ce sa fac acum?
+
+                    }
+                }
+            }
+        } else {
+            throw new NoSuchElementException("Doctor does not exist");
+        }
+    }
+
+    //delete
+    public void removeAppointment(Doctor doctor, Appointment appointment) {
+        if (appointmentMap.containsKey(doctor)) {
+            Set<Appointment> appointments = appointmentMap.get(doctor);
+            if (appointments.contains(appointment)) {
+                appointments.remove(appointment);
+                refreshMap(doctor, appointments);
+            } else {
+                throw new NoSuchElementException("Appointment does not exist");
+            }
+        } else {
+            throw new NoSuchElementException("Doctor does not exist");
+        }
+    }
+
     //helper methods
     private void matchDoctorsAppointments(UserRepository ur, AppointmentRepository ar) {
         List<User> users = new ArrayList<>();
-        users.addAll(ur.getUsers());
+        users.addAll(ur.getAll());
         Set<Appointment> appointments = null;
         for (int i = 0; i < users.size(); i++) {
             Doctor doctor = null;
@@ -71,17 +110,24 @@ public class Agenda {
         }
     }
     private Set<Appointment> matchAppointments(Doctor doctor, AppointmentRepository ar) {
-        List<Appointment> allAppointments = ar.getAppointments();
+        Set<Appointment> allAppointments = ar.getAll();
         Set<Appointment> doctorAppointments = new TreeSet<>();
 
-        for (int i = 0; i < allAppointments.size(); i++) {
-            Appointment appointment = allAppointments.get(i);
+        Iterator<Appointment> iterator = allAppointments.iterator();
+
+        while (iterator.hasNext()) {
+            Appointment appointment = iterator.next();
             if (appointment.getDoctorId() == doctor.getUserId()) {
                 doctorAppointments.add(appointment);
             }
         }
 
         return doctorAppointments;
+    }
+
+    private void refreshMap(Doctor doctor, Set<Appointment> appointments) {
+        appointmentMap.remove(doctor);
+        appointmentMap.put(doctor, appointments);
     }
 
 

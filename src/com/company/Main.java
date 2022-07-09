@@ -11,7 +11,7 @@ public class Main {
      - ViewLogIn
         full test
      - UserRepository
-        de refacut ca singleton
+        de refacut ca singleton (oare?)
         full test except load()
      - DoctorView
         (everything)
