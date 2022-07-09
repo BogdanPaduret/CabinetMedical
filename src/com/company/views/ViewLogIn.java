@@ -14,13 +14,15 @@ public class ViewLogIn implements View {
     //instance variables
     Set<User> users;
     User user;
-    private String path;
+    private String usersPath;
+    private String appointmentsPath;
 
 
     //constructors
     public ViewLogIn(String rootPath) {
-        this.path = rootPath + "com/company/repositories/users";
-        UserRepository userRepository = new UserRepository(path);
+        this.usersPath = rootPath + "com/company/repositories/users";
+        this.appointmentsPath = rootPath + "com/company/repositories/appointments";
+        UserRepository userRepository = new UserRepository(usersPath);
         users = userRepository.getAll();
 
         user = null;
@@ -97,7 +99,7 @@ public class ViewLogIn implements View {
         System.out.println("Salvati?");
         char ans = scanner.nextLine().toLowerCase().charAt(0);
         if (ans == 'y') {
-            UserRepository ur = new UserRepository(path, users);
+            UserRepository ur = new UserRepository(usersPath, users);
             ur.save();
             System.out.println("Baza de date cu utilizatori SALVATA");
         } else {
@@ -110,10 +112,10 @@ public class ViewLogIn implements View {
             View view = null;
 
             if (user instanceof Doctor doctor) {
-                view = new DoctorView(path, doctor);
+                view = new DoctorView(usersPath, appointmentsPath, doctor);
             }
             if (user instanceof Patient patient) {
-                view = new PatientView(path, patient);
+                view = new PatientView(usersPath, appointmentsPath, patient);
             }
 
             view.play();
@@ -155,7 +157,7 @@ public class ViewLogIn implements View {
             System.out.println(abort);
         } else {
             String name = input[1];
-            UserRepository ur = new UserRepository(path,users);
+            UserRepository ur = new UserRepository(usersPath,users);
             ur.addUser(type, name);
             users = ur.getAll();
         }

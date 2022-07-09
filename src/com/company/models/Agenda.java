@@ -10,6 +10,8 @@ public class Agenda {
 
     //instance variables
     private Map<Doctor, Set<Appointment>> appointmentMap;
+    private Set<User> users;
+    private Set<Appointment> appointments;
 
     //constructor
     public Agenda() {
@@ -21,7 +23,14 @@ public class Agenda {
         UserRepository ur = new UserRepository(usersPath);
         AppointmentRepository ar = new AppointmentRepository(appointmentsPath);
 
-        matchDoctorsAppointments(ur, ar);
+//        cod comentat in cazul in care in repositories nu voi avea load-ul in constructor
+//        ur.load();
+//        ar.load();
+
+        users = ur.getAll();
+        appointments = ar.getAll();
+
+        matchDoctorsAppointments(users, appointments);
     }
     public Agenda(Map<Doctor, Set<Appointment>> appointmentMap) {
         this.appointmentMap = appointmentMap;
@@ -44,16 +53,21 @@ public class Agenda {
     }
 
     //read
-    public Appointment[] getDoctorAppointments(Doctor doctor) {
-        //pentru a returna ca vector, mai intai incarcam lista si o cast-uim intr-un arraylist
-        ArrayList<Appointment> appointmentsList = new ArrayList<>();
-        appointmentsList.addAll(appointmentMap.get(doctor));
+    public Collection<Appointment> getDoctorAppointments(Doctor doctor) {
+        return appointmentMap.get(doctor);
+    }
 
-        //cod convertire ArrayList in vector
-        Appointment[] appointments = new Appointment[0];
-        appointments = appointmentsList.toArray(appointments);
+    public Set<Patient> getAllPatients() {
+        Set<Patient> patients = new TreeSet<>();
 
-        return appointments;
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            if (user instanceof Patient patient) {
+                patients.add(patient);
+            }
+        }
+        return patients;
     }
 
     //update
@@ -68,8 +82,10 @@ public class Agenda {
                         a.set(appointment);
                         refreshMap(doctor, appointments);
                     } else {
-                        //ce sa fac acum?
-
+                        appointments.remove(appointment);
+                        refreshMap(doctor, appointments);
+                        doctor = getDoctorById(appointment.getDoctorId());
+                        addAppointment(doctor, appointment);
                     }
                 }
             }
@@ -94,23 +110,23 @@ public class Agenda {
     }
 
     //helper methods
-    private void matchDoctorsAppointments(UserRepository ur, AppointmentRepository ar) {
-        List<User> users = new ArrayList<>();
-        users.addAll(ur.getAll());
-        Set<Appointment> appointments = null;
-        for (int i = 0; i < users.size(); i++) {
+    private void matchDoctorsAppointments(Set<User> users, Set<Appointment> appointments) {
+        Iterator<User> iterator = users.iterator();
+        Set<Appointment> doctorAppointments;
+        while (iterator.hasNext()) {
             Doctor doctor = null;
-            if (users.get(i) instanceof Doctor) {
-                doctor = (Doctor) users.get(i);
+            User user = iterator.next();
+            if (user instanceof Doctor) {
+                doctor = (Doctor) user;
             }
             if (doctor != null) {
-                appointments = matchAppointments(doctor, ar);
-                appointmentMap.put(doctor, appointments);
+                doctorAppointments = matchAppointments(doctor, appointments);
+                appointmentMap.put(doctor, doctorAppointments);
             }
         }
     }
-    private Set<Appointment> matchAppointments(Doctor doctor, AppointmentRepository ar) {
-        Set<Appointment> allAppointments = ar.getAll();
+
+    private Set<Appointment> matchAppointments(Doctor doctor, Set<Appointment> allAppointments) {
         Set<Appointment> doctorAppointments = new TreeSet<>();
 
         Iterator<Appointment> iterator = allAppointments.iterator();
@@ -128,6 +144,19 @@ public class Agenda {
     private void refreshMap(Doctor doctor, Set<Appointment> appointments) {
         appointmentMap.remove(doctor);
         appointmentMap.put(doctor, appointments);
+    }
+
+    private Doctor getDoctorById(int id) {
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            if (user instanceof Doctor doctor) {
+                if (doctor.getUserId() == id) {
+                    return doctor;
+                }
+            }
+        }
+        throw new NoSuchElementException("Doctor does not exist");
     }
 
 

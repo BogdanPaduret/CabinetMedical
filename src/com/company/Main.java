@@ -11,11 +11,12 @@ public class Main {
      - ViewLogIn
         full test
      - UserRepository
-        de refacut ca singleton (oare?)
         full test except load()
      - DoctorView
-        (everything)
-        should also have access to appointments path, not just users path ???
+        toSaveOrNotToSave()
+        closeAppointment()
+        createAppointment()
+        full test
      - PatientView
         (everything)
         should also have access to appointments path, not just users path!

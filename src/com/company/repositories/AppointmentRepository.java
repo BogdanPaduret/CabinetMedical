@@ -13,7 +13,7 @@ public class AppointmentRepository implements Repository<Appointment>{
     public AppointmentRepository(String path) {
         this.path = path;
         this.appointments = new TreeSet<>();
-//        this.load();
+        this.load();
     }
     public AppointmentRepository(String path, Collection<Appointment> appointments) {
         this.path = path;
