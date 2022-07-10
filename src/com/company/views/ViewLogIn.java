@@ -1,29 +1,28 @@
 package com.company.views;
 
+import com.company.helpers.Utils;
 import com.company.models.Doctor;
 import com.company.models.Patient;
+import com.company.models.Secretary;
 import com.company.models.User;
 import com.company.repositories.UserRepository;
 
 import java.util.*;
 
-import static com.company.helpers.Utils.checkType;
+import static com.company.helpers.Utils.*;
 
 public class ViewLogIn implements View {
 
     //instance variables
-    Set<User> users;
     User user;
-    private String usersPath;
-    private String appointmentsPath;
 
 
     //constructors
-    public ViewLogIn(String rootPath) {
-        this.usersPath = rootPath + "com/company/repositories/users";
-        this.appointmentsPath = rootPath + "com/company/repositories/appointments";
-        UserRepository userRepository = new UserRepository(usersPath);
-        users = userRepository.getAll();
+    public ViewLogIn(String repositoriesPath) {
+        String usersPath = repositoriesPath + "/users";
+        String appointmentsPath = repositoriesPath + "/appointments";
+
+        Utils.pathInit(usersPath, appointmentsPath);
 
         user = null;
     }
@@ -34,7 +33,7 @@ public class ViewLogIn implements View {
         String string = "";
 
         if (user != null) {
-            string += "\nLogat ca: " + user.getName();
+            string += "\nLogat ca: " + user.getUserName();
             string += "\nApasati 1 pentru a schimba utilizatorul";
         } else {
             string += "\nApasati 1 pentru a va loga";
@@ -43,7 +42,7 @@ public class ViewLogIn implements View {
         string += "\nApasati 2 pentru a va inregistra";
 
         if (user != null) {
-            string += "\nApasati 3 pentru a intra in aplicatie ca " + user.getName();
+            string += "\nApasati 3 pentru a intra in aplicatie ca " + user.getUserName();
         }
 
         string += "\nApasati 0 pentru a iesi";
@@ -53,7 +52,10 @@ public class ViewLogIn implements View {
 
     //play
     public void play() {
-        Scanner scanner = new Scanner(System.in);
+        this.play("");
+    }
+    public void play(String inputStrings) {
+        Scanner scanner = getScanner(inputStrings);
 
         boolean running = true;
         int choice = -1;
@@ -70,6 +72,7 @@ public class ViewLogIn implements View {
             switch (choice) {
                 case 3:
                     enterApp();
+                    user = null;
                 default:
                     break;
                 case 0:
@@ -90,21 +93,10 @@ public class ViewLogIn implements View {
         System.out.println("Sigur iesiti din aplicatie?");
         char ans = scanner.nextLine().toLowerCase().charAt(0);
         if (ans == 'y') {
-            toSaveOrNotToSave(scanner);
+            toSaveOrNotToSaveUsers(scanner);
             return true;
         }
         return false;
-    }
-    private void toSaveOrNotToSave(Scanner scanner) {
-        System.out.println("Salvati?");
-        char ans = scanner.nextLine().toLowerCase().charAt(0);
-        if (ans == 'y') {
-            UserRepository ur = new UserRepository(usersPath, users);
-            ur.save();
-            System.out.println("Baza de date cu utilizatori SALVATA");
-        } else {
-            System.out.println("Baza de date cu utilizatori NU a fost SALVATA");
-        }
     }
 
     private void enterApp() {
@@ -112,18 +104,24 @@ public class ViewLogIn implements View {
             View view = null;
 
             if (user instanceof Doctor doctor) {
-                view = new DoctorView(usersPath, appointmentsPath, doctor);
+                view = new DoctorView(doctor);
             }
             if (user instanceof Patient patient) {
-                view = new PatientView(usersPath, appointmentsPath, patient);
+                view = new PatientView(patient);
+            }
+            if (user instanceof Secretary secretary) {
+                view = new SecretaryView(secretary);
             }
 
-            view.play();
+            if (view != null) {
+                view.play();
+            } else {
+                throw new NoSuchElementException("O eroare a aparut la crearea acestei ferestre. Verificati daca acest tip de utilizator are un View implementat");
+            }
         }
     }
 
     private void logIn(Scanner scanner) {
-
         System.out.println("Introduceti id-ul si numele utilizatorului, separate prin virgula");
         String[] input = scanner.nextLine().split(",");
         if (input.length == 2) {
@@ -153,24 +151,24 @@ public class ViewLogIn implements View {
         String abort = "Date incorecte! Nu s-a creat nici un utilizator nou.";
 
         String type = input[0];
-        if (input.length != 2 || !checkType(type)) {
+        if (input.length != 2 || !checkUserType(type)) {
             System.out.println(abort);
         } else {
             String name = input[1];
-            UserRepository ur = new UserRepository(usersPath,users);
-            ur.addUser(type, name);
-            users = ur.getAll();
+            userRepository.add(type,name);
         }
 
     }
 
     private void setUser(int id, String name) throws NoSuchElementException {
-        for (User proxy : users) {
-            if (proxy.getUserId() == id && proxy.getName().equals(name)) {
+        for (User proxy : Utils.userRepository.getAll()) {
+            if (proxy.getUserId() == id && proxy.getUserName().equals(name)) {
                 user = proxy;
             }
         }
-        throw new NoSuchElementException("Invalid input");
+        if (user == null) {
+            throw new NoSuchElementException("Invalid user input");
+        }
     }
 
 }

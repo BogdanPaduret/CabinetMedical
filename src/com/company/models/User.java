@@ -7,20 +7,20 @@ public abstract class User implements Comparable<User> {
     //instance variables
     private String type;
     private int userId;
-    private String name;
+    private String userName;
 
     //constructor
-    public User(String type, int userId, String name) {
+    public User(String type, int userId, String userName) {
         this.type = type;
         this.userId = userId;
-        this.name = name;
+        this.userName = userName;
     }
 
     //read
     public String saveString() {
         String string = "";
 
-        string += getType() + SAVE_SEPARATOR + getUserId() + SAVE_SEPARATOR + getName();
+        string += getType() + SAVE_SEPARATOR + getUserId() + SAVE_SEPARATOR + getUserName();
 
         return string;
     }
@@ -30,8 +30,8 @@ public abstract class User implements Comparable<User> {
     public int getUserId() {
         return userId;
     }
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
     //update
@@ -41,13 +41,13 @@ public abstract class User implements Comparable<User> {
     public void setUserId(int userId) {
         this.userId = userId;
     }
-    public void setName(String name) {
-        this.name = name;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
     public void set(User user) {
         this.type = user.type;
         this.userId = user.userId;
-        this.name = user.name;
+        this.userName = user.userName;
     }
 
     //implemented methods
@@ -56,7 +56,7 @@ public abstract class User implements Comparable<User> {
         return (o instanceof User user) &&
                 this.getType().equals(user.getType()) &&
                 this.getUserId() == user.getUserId() &&
-                this.getName().equals(user.getName());
+                this.getUserName().equals(user.getUserName());
     }
     @Override
     public int compareTo(User o){
@@ -73,7 +73,7 @@ public abstract class User implements Comparable<User> {
 
         string += "User type: " + getType();
         string += "\nUser ID: " + getUserId();
-        string += "\nUser Name: " + getName();
+        string += "\nUser Name: " + getUserName();
 
         return string;
     }

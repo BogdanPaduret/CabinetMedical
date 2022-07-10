@@ -1,9 +1,17 @@
 package com.company;
 
+import com.company.views.ViewLogIn;
+
 public class Main {
 
     public static void main(String[] args) {
-        // write your code here
+        viewLogInTest();
+    }
+
+    public static void viewLogInTest() {
+        String rootPath = "test/com/company/repositories";
+        ViewLogIn logIn = new ViewLogIn(rootPath);
+        logIn.play();
     }
 
     /*

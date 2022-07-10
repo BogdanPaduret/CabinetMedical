@@ -1,12 +1,12 @@
 package com.company.views;
 
 import com.company.models.*;
-import com.company.repositories.AppointmentRepository;
-import com.company.repositories.UserRepository;
 
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static com.company.helpers.Utils.getScanner;
 
 public class DoctorView implements View {
 
@@ -16,19 +16,16 @@ public class DoctorView implements View {
     private Set<Patient> patients;
 
     //constructor
-    public DoctorView(String usersPath, String appointmentsPath, Doctor doctor) {
+    public DoctorView(Doctor doctor) {
         this.doctor = doctor;
-        Agenda agenda = new Agenda(usersPath, appointmentsPath);
-        appointments = new TreeSet<>(agenda.getDoctorAppointments(doctor));
-        patients = new TreeSet<>(agenda.getAllPatients());
-
+        Agenda agenda = new Agenda();
     }
 
     //menu
     private void menu() {
         String string = "";
 
-        string += "Logat ca doctor " + doctor.getName();
+        string += "Logat ca doctor " + doctor.getUserName();
         string += "\nApasati 1 pentru a vedea programarile";
         string += "\nApasati 2 pentru a inchide o programare";
         string += "\nApasati 3 pentru a crea o noua programare";
@@ -40,7 +37,11 @@ public class DoctorView implements View {
     //play
     @Override
     public void play() {
-        Scanner scanner = new Scanner(System.in);
+        this.play("");
+    }
+    public void play(String inputStrings) {
+        Scanner scanner = getScanner(inputStrings);
+
         boolean running = true;
         int choice = -1;
 
@@ -94,7 +95,7 @@ public class DoctorView implements View {
         Iterator<Appointment> iterator = appointments.iterator();
         while (iterator.hasNext()) {
             Appointment appointment = iterator.next();
-            System.out.println(appointmentString(appointment));
+            System.out.println(doctorAppointmentString(appointment));
         }
     }
 
@@ -116,7 +117,7 @@ public class DoctorView implements View {
         }
         throw new NoSuchElementException("Patient with ID: " + id + " does not exist");
     }
-    private String appointmentString(Appointment appointment) {
+    private String doctorAppointmentString(Appointment appointment) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy HH:mm a");
 
         Duration duration = appointment.getDuration();
@@ -129,7 +130,7 @@ public class DoctorView implements View {
         int minutes = (int) duration.toMinutes();
 
         String string = "";
-        string += "\nAppointment with patient " + getPatient(appointment.getPatientId()).getName() + ":";
+        string += "\nAppointment with patient " + getPatient(appointment.getPatientId()).getUserName() + ":";
         string += "\nStarts on " + appointment.getStartDate().format(formatter);
         string += "\nEnds on " + appointment.getEndDate().format(formatter);
         string += "\nDuration:";

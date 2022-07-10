@@ -7,8 +7,8 @@ public class Doctor extends User {
     //instance variables
 
     //constructor
-    public Doctor(int userId, String name) {
-        super(USER_DOCTOR, userId, name);
+    public Doctor(int userId, String userName) {
+        super(USER_DOCTOR, userId, userName);
     }
 
     //implemented methods
@@ -17,7 +17,7 @@ public class Doctor extends User {
         String string = "";
 
         string += "Doctor ID: " + this.getUserId();
-        string += "\nDoctor Name: " + this.getName();
+        string += "\nDoctor Name: " + this.getUserName();
 
         return string;
     }

@@ -2,6 +2,7 @@ package com.company.repositories;
 
 import com.company.models.Doctor;
 import com.company.models.Patient;
+import com.company.models.Secretary;
 import com.company.models.User;
 
 import java.io.File;
@@ -10,11 +11,12 @@ import java.io.PrintWriter;
 import java.util.*;
 
 import static com.company.helpers.Constants.*;
-import static com.company.helpers.Utils.checkType;
+import static com.company.helpers.Utils.*;
 
 public class UserRepository implements Repository<User>{
 
     //instance variables
+    private Hashtable<String, Collection<User>> hashtable;
     private TreeSet<User> users;
     private String path;
 
@@ -47,14 +49,13 @@ public class UserRepository implements Repository<User>{
     }
     @Override
     public void add(User user) {
-        addUser(user.getType(), user.getName());
+        add(user.getType(), user.getUserName());
     }
-    public boolean addUser(String type, String name) {
-        if (checkType(type)) {
-            users.add(createUser(type, name));
-            return true;
+    public void add(String type, String name) {
+        if (checkUserType(type)) {
+            users.add(createUser(type, generateNewId(), name));
         } else {
-            return false;
+            throw new NoSuchElementException("Acest tip de utilizator nu exista.");
         }
     }
 
@@ -74,6 +75,18 @@ public class UserRepository implements Repository<User>{
                     } catch (ClassCastException e) {
                         e.printStackTrace();
                     }
+
+                    //todo de terminat codul pentru a umple hashtable-ul cu 3 intrari: 3 chei String doctor, patient, secretary si ca valori
+                    if (user instanceof Doctor doctor) {
+                        Set<User> doctors = new TreeSet<>();
+                        if (hashtable.containsKey(USER_DOCTOR)) {
+                            doctors.addAll(hashtable.get(USER_DOCTOR));
+                        }
+                        doctors.add(doctor);
+                        hashtable.remove(USER_DOCTOR);
+                        hashtable.put(USER_DOCTOR, doctors);
+                    }
+
                 }
             }
 
@@ -104,9 +117,20 @@ public class UserRepository implements Repository<User>{
     public Set<User> getAll() {
         return users;
     }
+//    public Set<User> getAll(User user) {
+//        Set<User> userSubset = new TreeSet<>();
+//        Iterator<User> iterator = users.iterator();
+//        while (iterator.hasNext()) {
+//            User u = iterator.next();
+//            if (user instanceof user.getClass()) {
+//                userSubset.add(user);
+//            }
+//        }
+//        return userSubset;
+//    }
     public boolean exists(int id, String name) {
         for (User user : users) {
-            if (user.getUserId() == id && user.getName().equals(name)) {
+            if (user.getUserId() == id && user.getUserName().equals(name)) {
                 return true;
             }
         }
@@ -166,37 +190,7 @@ public class UserRepository implements Repository<User>{
 
         return string;
     }
-    private User createUser(String line) {
-        String[] input = line.split(SAVE_SEPARATOR);
-        String userType = input[0];
-        int userId = Integer.parseInt(input[1]);
-        String userName = input[2];
-
-        switch (userType) {
-            default:
-                return null;
-            case USER_DOCTOR:
-                return new Doctor(userId, userName);
-            case USER_PATIENT:
-                return new Patient(userId, userName);
-        }
-
-    }
-    private User createUser(String type, String name) {
-        int id = generateNewId();
-        return createUser(type, id, name);
-    }
-    private User createUser(String type, int id, String name) {
-        switch (type) {
-            default:
-                return null;
-            case USER_DOCTOR:
-                return new Doctor(id, name);
-            case USER_PATIENT:
-                return new Patient(id, name);
-        }
-    }
-    private int generateNewId() {
+    public int generateNewId() {
         return users.last().getUserId() + 1;
     }
 

@@ -3,11 +3,11 @@ package com.company.repositories;
 import com.company.models.Doctor;
 import com.company.models.Patient;
 import com.company.models.User;
-import com.company.repositories.UserRepository;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,8 +48,8 @@ class UserRepositoryTest {
         ur = new UserRepository(path);
         assertEquals(6, ur.size());
 
-        boolean truth = ur.addUser("doctor", "Doctorescu Matei");
-        assertTrue(truth);
+//        assertDoesNotThrow();
+        ur.add("doctor", "Doctorescu Matei")
 
         assertEquals(7, ur.size());
         assertEquals(show + "Doctor ID: 6\n" +

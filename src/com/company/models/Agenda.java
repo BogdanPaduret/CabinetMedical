@@ -1,5 +1,6 @@
 package com.company.models;
 
+import com.company.helpers.Utils;
 import com.company.repositories.AppointmentRepository;
 import com.company.repositories.UserRepository;
 
@@ -10,27 +11,15 @@ public class Agenda {
 
     //instance variables
     private Map<Doctor, Set<Appointment>> appointmentMap;
-    private Set<User> users;
-    private Set<Appointment> appointments;
 
     //constructor
     public Agenda() {
-        this("test/com/company/repositories/users", "test/com/company/repositories/appointments");
+
     }
     public Agenda(String usersPath,String appointmentsPath) {
         appointmentMap = new TreeMap<>();
 
-        UserRepository ur = new UserRepository(usersPath);
-        AppointmentRepository ar = new AppointmentRepository(appointmentsPath);
-
-//        cod comentat in cazul in care in repositories nu voi avea load-ul in constructor
-//        ur.load();
-//        ar.load();
-
-        users = ur.getAll();
-        appointments = ar.getAll();
-
-        matchDoctorsAppointments(users, appointments);
+        matchDoctorsAppointments(Utils.userRepository.getAll(), Utils.appointmentRepository.getAll());
     }
     public Agenda(Map<Doctor, Set<Appointment>> appointmentMap) {
         this.appointmentMap = appointmentMap;
@@ -55,19 +44,6 @@ public class Agenda {
     //read
     public Collection<Appointment> getDoctorAppointments(Doctor doctor) {
         return appointmentMap.get(doctor);
-    }
-
-    public Set<Patient> getAllPatients() {
-        Set<Patient> patients = new TreeSet<>();
-
-        Iterator<User> iterator = users.iterator();
-        while (iterator.hasNext()) {
-            User user = iterator.next();
-            if (user instanceof Patient patient) {
-                patients.add(patient);
-            }
-        }
-        return patients;
     }
 
     //update
@@ -147,16 +123,11 @@ public class Agenda {
     }
 
     private Doctor getDoctorById(int id) {
-        Iterator<User> iterator = users.iterator();
-        while (iterator.hasNext()) {
-            User user = iterator.next();
-            if (user instanceof Doctor doctor) {
-                if (doctor.getUserId() == id) {
-                    return doctor;
-                }
-            }
+        User user = Utils.userRepository.get(id);
+        if (user instanceof Doctor doctor) {
+            return doctor;
         }
-        throw new NoSuchElementException("Doctor does not exist");
+        throw new NoSuchElementException("Doctor with given ID does not exist");
     }
 
 
