@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,16 +16,16 @@ class UserRepositoryTest {
 
     @Test
     public void saveTest() {
-        List<User> doctors = new ArrayList<>();
+        List<User> users = new ArrayList<>();
 
-        doctors.add(new Doctor(0, "Petrescu Marian"));
-        doctors.add(new Doctor(1, "Neculce Dumitru"));
-        doctors.add(new Patient(2, "Dimitrie Cantemir"));
-        doctors.add(new Doctor(3, "Cinevescu Ioan"));
-        doctors.add(new Patient(4, "Cutarescu Vladimir"));
-        doctors.add(new Patient(5, "Slovescu Adrian"));
+        users.add(new Doctor(0, "Petrescu Marian"));
+        users.add(new Doctor(1, "Neculce Dumitru"));
+        users.add(new Patient(2, "Dimitrie Cantemir"));
+        users.add(new Doctor(3, "Cinevescu Ioan"));
+        users.add(new Patient(4, "Cutarescu Vladimir"));
+        users.add(new Patient(5, "Slovescu Adrian"));
 
-        UserRepository ur = new UserRepository(path, doctors);
+        UserRepository ur = new UserRepository(path, users);
 
         System.out.println(ur.show());
         String show = "Doctor ID: 0\n" +

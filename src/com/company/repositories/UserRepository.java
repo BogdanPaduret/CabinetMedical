@@ -56,6 +56,7 @@ public class UserRepository implements Repository<User>{
     public void add(String type, String name) {
         if (Utils.checkUserType(type)) {
             users.add(Utils.createUser(type, generateNewId(), name));
+            splitUsers();
         } else {
             throw new NoSuchElementException("Acest tip de utilizator nu exista.");
         }
@@ -180,6 +181,14 @@ public class UserRepository implements Repository<User>{
     public int generateNewId() {
         return users.last().getUserId() + 1;
     }
+
+    /*
+    Momentan metoda constructorul va popula usersHashtable tot timpul.
+    Asta scade efortul de a incarca o lista cu useri dar consuma mai multa memorie.
+    Se poate sa introduc metoda splitUsers() in getAll(String type) pentru a elibera memoria
+    DAR va avea nevoie de mai mult timp metoda pentru a returna lista.
+     */
+
     private void splitUsers() {
         for (User user : users) {
             sublistUser(user);
@@ -187,7 +196,7 @@ public class UserRepository implements Repository<User>{
     }
     private void sublistUser(User user) {
         for (int i = 0; i < USERS_ARRAY.length; i++) {
-            if (user.getClass().getSimpleName().equals(USERS_ARRAY[i])) {
+            if (user.getClass().getSimpleName().toLowerCase().equals(USERS_ARRAY[i])) {
                 if (usersHashtable.containsKey(USERS_ARRAY[i])) {
                     usersHashtable.get(USERS_ARRAY[i]).add(user);
                 }

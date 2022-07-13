@@ -67,13 +67,9 @@ public final class Utils {
     public static Hashtable<String, Set> createEmptyUserSetsHashtable() {
         Hashtable<String,Set> hashtable = new Hashtable<>();
 
-        Set<User> doctors = new TreeSet<>();
-        Set<Patient> patients = new TreeSet<>();
-        Set<Secretary> secretaries = new TreeSet<>();
-
-        hashtable.put(USER_DOCTOR, doctors);
-        hashtable.put(USER_PATIENT, patients);
-        hashtable.put(USER_SECRETARY, secretaries);
+        for (int i = 0; i < USERS_ARRAY.length; i++) {
+            hashtable.put(USERS_ARRAY[i], new TreeSet<>());
+        }
 
         return hashtable;
     }
