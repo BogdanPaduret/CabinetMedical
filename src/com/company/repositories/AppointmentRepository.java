@@ -1,6 +1,7 @@
 package com.company.repositories;
 
 import com.company.models.Appointment;
+import com.company.views.Observer;
 
 import java.io.*;
 import java.util.*;
@@ -10,14 +11,18 @@ public class AppointmentRepository implements Repository<Appointment>{
     private Set<Appointment> appointments;
     private String path;
 
-    public AppointmentRepository(String path) {
+    private ArrayList<Observer> observers;
+
+    private void init(String path) {
         this.path = path;
         this.appointments = new TreeSet<>();
-        this.load();
+        this.observers = new ArrayList<>();
+    }
+    public AppointmentRepository(String path) {
+        this.init(path);
     }
     public AppointmentRepository(String path, Collection<Appointment> appointments) {
-        this.path = path;
-        this.appointments = new TreeSet<>();
+        this.init(path);
         this.appointments.addAll(appointments);
     }
 
@@ -118,5 +123,21 @@ public class AppointmentRepository implements Repository<Appointment>{
     @Override
     public void remove(Appointment appointment) {
         appointments.remove(appointment);
+    }
+
+    //observer pattern
+    @Override
+    public void registerObserver(com.company.views.Observer observer) {
+        observers.add(observer);
+    }
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+    @Override
+    public void notifyObservers() {
+        for (int i = 0; i < observers.size(); i++) {
+            observers.get(i).update(this);
+        }
     }
 }

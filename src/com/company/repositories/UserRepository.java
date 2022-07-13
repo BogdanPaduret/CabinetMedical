@@ -1,7 +1,9 @@
 package com.company.repositories;
 
+import com.company.exceptions.NoUserTypeException;
 import com.company.helpers.Utils;
 import com.company.models.*;
+import com.company.views.Observer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -14,24 +16,23 @@ import static com.company.helpers.Utils.*;
 public class UserRepository implements Repository<User>{
 
     //instance variables
-    private Hashtable<String, Set> usersHashtable;
     private TreeSet<User> users;
     private String path;
+
+    private ArrayList<Observer> observers;
 
     //constructor
     private void init(String path) {
         this.users = new TreeSet<>();
         this.path = path;
-        usersHashtable= createEmptyUserSetsHashtable();
+        observers = new ArrayList<>();
     }
     public UserRepository(String path) {
         init(path);
-        this.load();
     }
     public UserRepository(String path, Collection<User> users) {
         init(path);
         this.users.addAll(users);
-        splitUsers();
     }
 
     //create
@@ -50,15 +51,17 @@ public class UserRepository implements Repository<User>{
         }
     }
     @Override
-    public void add(User user) {
+    public void add(User user)
+            throws NoUserTypeException {
         add(user.getType(), user.getUserName());
     }
-    public void add(String type, String name) {
-        if (Utils.checkUserType(type)) {
+    public void add(String type, String name)
+            throws NoUserTypeException {
+        if (Utils.typeExists(type)) {
             users.add(Utils.createUser(type, generateNewId(), name));
-            splitUsers();
+            notifyObservers();
         } else {
-            throw new NoSuchElementException("Acest tip de utilizator nu exista.");
+            throw new NoUserTypeException();
         }
     }
 
@@ -79,9 +82,6 @@ public class UserRepository implements Repository<User>{
                         e.printStackTrace();
                     }
 
-                    //code pentru a umple hashtable-ul cu utilizatori diferiti
-                    sublistUser(user);
-
                 }
             }
 
@@ -100,7 +100,8 @@ public class UserRepository implements Repository<User>{
         return c;
     }
     @Override
-    public User get(int id) throws NoSuchElementException{
+    public User get(int id)
+            throws NoSuchElementException {
         for (User user : users) {
             if (user.getUserId() == id) {
                 return user;
@@ -112,8 +113,15 @@ public class UserRepository implements Repository<User>{
     public Set<User> getAll() {
         return users;
     }
-    public Set getAll(String type) {
-        return usersHashtable.get(type);
+    public Set<User> getAll(String type)
+            throws NoUserTypeException {
+        if (typeExists(type)) {
+            Hashtable<String, Set<User>> usersHashtable = createEmptyUserSetsHashtable();
+            splitUsers(usersHashtable);
+            return usersHashtable.get(type);
+        } else {
+            throw new NoUserTypeException();
+        }
     }
 
     public boolean exists(int id, String name) {
@@ -141,30 +149,64 @@ public class UserRepository implements Repository<User>{
     public void setPath(String path) {
         this.path = path;
     }
+
     @Override
-    public void set(int id, User user) {
+    public void set(int id, User user)
+            throws NoSuchElementException {
         Iterator<User> iterator = users.iterator();
+        boolean updated = false;
         while (iterator.hasNext()) {
             User u = iterator.next();
             if (u.getUserId() == id) {
                 u.set(user);
+                updated = true;
             }
+        }
+        if (!updated) {
+            throw new NoSuchElementException();
+        } else {
+            notifyObservers();
         }
     }
     @Override
     public void addAll(Collection<User> users) {
         this.users.addAll(users);
+        notifyObservers();
     }
 
     //delete
     @Override
     public void clear() {
         users.clear();
+        notifyObservers();
     }
     @Override
     public void remove(User user) {
         users.remove(user);
+        notifyObservers();
     }
+
+    //observer pattern
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+    @Override
+    public void removeObserver(Observer observer) {
+        observers.remove(observer);
+    }
+    @Override
+    public void notifyObservers() {
+        for (int i = 0; i < observers.size(); i++) {
+            observers.get(i).update(this);
+        }
+    }
+
+
+
+
+
+
 
     //helpers
     private String toSave() {
@@ -179,31 +221,36 @@ public class UserRepository implements Repository<User>{
         return string;
     }
     public int generateNewId() {
-        return users.last().getUserId() + 1;
-    }
-
-    /*
-    Momentan metoda constructorul va popula usersHashtable tot timpul.
-    Asta scade efortul de a incarca o lista cu useri dar consuma mai multa memorie.
-    Se poate sa introduc metoda splitUsers() in getAll(String type) pentru a elibera memoria
-    DAR va avea nevoie de mai mult timp metoda pentru a returna lista.
-     */
-
-    private void splitUsers() {
-        for (User user : users) {
-            sublistUser(user);
+        try {
+            return users.last().getUserId() + 1;
+        } catch (NoSuchElementException e) {
+            return 0;
         }
     }
-    private void sublistUser(User user) {
+
+
+    private void splitUsers(Hashtable<String, Set<User>> usersHashtable)
+            throws NoUserTypeException {
+        for (User user : users) {
+            sublistUser(usersHashtable, user);
+        }
+    }
+
+    private void sublistUser(Hashtable<String, Set<User>> usersHashtable, User user)
+            throws NoUserTypeException {
+        boolean hit = false;
         for (int i = 0; i < USERS_ARRAY.length; i++) {
             if (user.getClass().getSimpleName().toLowerCase().equals(USERS_ARRAY[i])) {
                 if (usersHashtable.containsKey(USERS_ARRAY[i])) {
                     usersHashtable.get(USERS_ARRAY[i]).add(user);
+                    hit = true;
                 }
             }
         }
+        if (!hit) {
+            throw new NoUserTypeException();
+        }
 
     }
-
 
 }

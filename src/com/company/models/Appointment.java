@@ -70,7 +70,8 @@ public class Appointment implements Serializable, Comparable<Appointment> {
     }
 
     //create
-    private void writeObject(ObjectOutputStream oos) throws IOException {
+    private void writeObject(ObjectOutputStream oos)
+            throws IOException {
         oos.defaultWriteObject();
         //write ints of LocalDateTime for easy retrieval and localDateTime build
         LocalDateTime[] dates = {startDate, endDate};
@@ -85,7 +86,8 @@ public class Appointment implements Serializable, Comparable<Appointment> {
     }
 
     //read
-    private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
+    private void readObject(ObjectInputStream ois)
+            throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         LocalDateTime[] dates = {startDate, endDate};
 //        for (int i = 0; i < dates.length; i++) {

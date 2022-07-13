@@ -11,9 +11,6 @@ public class Agenda {
     private Map<Doctor, Set<Appointment>> appointmentMap;
 
     //constructor
-    public Agenda() {
-
-    }
     public Agenda(String usersPath,String appointmentsPath) {
         appointmentMap = new TreeMap<>();
 

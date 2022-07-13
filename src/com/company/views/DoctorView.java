@@ -1,6 +1,9 @@
 package com.company.views;
 
+import com.company.helpers.Utils;
 import com.company.models.*;
+import com.company.repositories.Observed;
+import com.company.repositories.Repository;
 
 import java.time.Duration;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +21,6 @@ public class DoctorView implements View {
     //constructor
     public DoctorView(Doctor doctor) {
         this.doctor = doctor;
-        Agenda agenda = new Agenda();
     }
 
     //menu
@@ -57,7 +59,7 @@ public class DoctorView implements View {
                 default:
                     break;
                 case 0:
-                    running = !exit(scanner);
+                    running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
                     break;
                 case 1:
                     showDoctorAppointments();
@@ -73,23 +75,6 @@ public class DoctorView implements View {
     }
 
     //helper methods
-    private boolean exit(Scanner scanner) {
-        System.out.println("Sigur doriti sa iesiti?");
-        char ans = scanner.nextLine().toLowerCase().charAt(0);
-        if (ans == 'y') {
-            toSaveOrNotToSave(scanner);
-            return true;
-        }
-        return false;
-    }
-
-    private void toSaveOrNotToSave(Scanner scanner) {
-        System.out.println("Salvati modificarile facute?");
-        char ans = scanner.nextLine().toLowerCase().charAt(0);
-        if (ans == 'y') {
-            //de continuat
-        }
-    }
 
     private void showDoctorAppointments() {
         Iterator<Appointment> iterator = appointments.iterator();

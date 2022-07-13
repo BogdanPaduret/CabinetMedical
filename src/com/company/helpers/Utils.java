@@ -4,17 +4,16 @@ import com.company.models.Doctor;
 import com.company.models.Patient;
 import com.company.models.Secretary;
 import com.company.models.User;
+import com.company.repositories.Observed;
+import com.company.repositories.Repository;
 
-import java.util.Hashtable;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import static com.company.helpers.Constants.*;
 
 public final class Utils {
     //users
-    public static boolean checkUserType(String type) {
+    public static boolean typeExists(String type) {
         for (int i = 0; i < USERS_ARRAY.length; i++) {
             if (USERS_ARRAY[i].equals(type)) {
                 return true;
@@ -44,17 +43,6 @@ public final class Utils {
         }
     }
 
-    public static void toSaveOrNotToSaveUsers(Scanner scanner) {
-        System.out.println("Salvati?");
-        char ans = scanner.nextLine().toLowerCase().charAt(0);
-        if (ans == 'y') {
-            RepositoryLoad.userRepository.save();
-            System.out.println("Baza de date cu utilizatori a fost SALVATA");
-        } else {
-            System.out.println("Baza de date cu utilizatori NU a fost SALVATA");
-        }
-    }
-
     //misc
     public static Scanner getScanner(String input) {
         if (input.equals("")) {
@@ -64,8 +52,8 @@ public final class Utils {
         }
     }
 
-    public static Hashtable<String, Set> createEmptyUserSetsHashtable() {
-        Hashtable<String,Set> hashtable = new Hashtable<>();
+    public static Hashtable<String, Set<User>> createEmptyUserSetsHashtable() {
+        Hashtable<String,Set<User>> hashtable = new Hashtable<>();
 
         for (int i = 0; i < USERS_ARRAY.length; i++) {
             hashtable.put(USERS_ARRAY[i], new TreeSet<>());
@@ -74,4 +62,49 @@ public final class Utils {
         return hashtable;
     }
 
+    //manipulation methods
+    public static boolean exitAskSave(Scanner scanner, Repository<?>[] repositories) {
+        System.out.println("Sigur iesiti din aplicatie?");
+        char ans = scanner.nextLine().toLowerCase().charAt(0);
+        if (ans == 'y') {
+            toSaveOrNotToSave(scanner, repositories);
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean toSaveOrNotToSave(Scanner scanner, Repository<?>[] repositories) {
+        System.out.println("Salvati?");
+        char ans = scanner.nextLine().toLowerCase().charAt(0);
+        String string = "Bazele de date";
+        boolean truth;
+        if (ans == 'y') {
+            try {
+                for (Repository<?> repository : repositories) {
+                    repository.save();
+                    string += "\n - " + repository.getClass().getSimpleName();
+                }
+                string += "\n";
+                truth = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                string += "\nnu ";
+                truth = false;
+            }
+        } else {
+            string += " nu ";
+            truth = false;
+        }
+        string += "au fost salvate";
+        System.out.println(string);
+        return truth;
+    }
+
+    public static void updateRepositoryListAfterChange(List<Repository<?>> repositories, Observed observed) {
+        try {
+            repositories.add((Repository<?>) observed);
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
+    }
 }

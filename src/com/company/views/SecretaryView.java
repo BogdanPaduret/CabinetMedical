@@ -1,10 +1,16 @@
 package com.company.views;
 
+import com.company.helpers.RepositoryLoad;
+import com.company.helpers.Utils;
 import com.company.models.Secretary;
+import com.company.repositories.Observed;
+import com.company.repositories.Repository;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import static com.company.helpers.Utils.getScanner;
+import static com.company.helpers.Utils.updateRepositoryListAfterChange;
 
 public class SecretaryView implements View {
 
@@ -45,13 +51,10 @@ public class SecretaryView implements View {
 
             switch (choice) {
                 case 0:
-                    running = !exit(scanner);
+                    running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
             }
         }
 
     }
 
-    private boolean exit(Scanner scanner) {
-        return true;
-    }
 }

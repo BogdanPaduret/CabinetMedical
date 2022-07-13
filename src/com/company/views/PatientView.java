@@ -1,6 +1,7 @@
 package com.company.views;
 
 import com.company.models.Patient;
+import com.company.repositories.Observed;
 
 import java.util.Scanner;
 
@@ -23,4 +24,5 @@ public class PatientView implements View {
 
 
     }
+
 }

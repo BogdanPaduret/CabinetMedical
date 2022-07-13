@@ -6,25 +6,28 @@ import com.company.models.Doctor;
 import com.company.models.Patient;
 import com.company.models.Secretary;
 import com.company.models.User;
+import com.company.repositories.Observed;
+import com.company.repositories.Repository;
 
 import java.util.*;
-
-import static com.company.helpers.RepositoryLoad.*;
 
 public class ViewLogIn implements View {
 
     //instance variables
-    User user;
-
+    private User user;
 
     //constructors
     public ViewLogIn(String repositoriesPath) {
         String usersPath = repositoriesPath + "/users";
         String appointmentsPath = repositoriesPath + "/appointments";
 
-        RepositoryLoad.pathInit(usersPath, appointmentsPath);
+        RepositoryLoad.init(usersPath, appointmentsPath);
 
         user = null;
+
+        RepositoryLoad.userRepository.registerObserver(this);
+        RepositoryLoad.appointmentRepository.registerObserver(this);
+
     }
 
 
@@ -76,7 +79,7 @@ public class ViewLogIn implements View {
                 default:
                     break;
                 case 0:
-                    running = !exit(scanner);
+                    running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
                     break;
                 case 1:
                     logIn(scanner);
@@ -88,16 +91,8 @@ public class ViewLogIn implements View {
         }
     }
 
+
     //helper methods
-    private boolean exit(Scanner scanner) {
-        System.out.println("Sigur iesiti din aplicatie?");
-        char ans = scanner.nextLine().toLowerCase().charAt(0);
-        if (ans == 'y') {
-            Utils.toSaveOrNotToSaveUsers(scanner);
-            return true;
-        }
-        return false;
-    }
 
     private void enterApp() {
         if (user != null) {
@@ -151,11 +146,11 @@ public class ViewLogIn implements View {
         String abort = "Date incorecte! Nu s-a creat nici un utilizator nou.";
 
         String type = input[0];
-        if (input.length != 2 || !Utils.checkUserType(type)) {
+        if (input.length != 2 || !Utils.typeExists(type)) {
             System.out.println(abort);
         } else {
             String name = input[1];
-            userRepository.add(type,name);
+            RepositoryLoad.userRepository.add(type,name);
         }
 
     }

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -53,6 +54,10 @@ class UserRepositoryTest {
         assertEquals(show + "Doctor ID: 6\n" +
                         "Doctor Name: Doctorescu Matei\n",
                 ur.show());
+        Set<User> userTypeSet = ur.getAll("doctor");
+        assertEquals(4, userTypeSet.size());
+        userTypeSet = ur.getAll("patient");
+        assertEquals(3, userTypeSet.size());
     }
 
 }
