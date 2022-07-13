@@ -19,6 +19,7 @@ public class Main {
      - ViewLogIn
         full test
      - UserRepository
+        subListUser() are ceva avertisment "Raw user of parameterized type" pe care nu stiu sa-l rezolv ca sa nu crape codul :)
         full test except load()
      - DoctorView
         toSaveOrNotToSave()

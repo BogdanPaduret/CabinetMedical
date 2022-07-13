@@ -48,8 +48,7 @@ class UserRepositoryTest {
         ur = new UserRepository(path);
         assertEquals(6, ur.size());
 
-//        assertDoesNotThrow();
-        ur.add("doctor", "Doctorescu Matei")
+        ur.add("doctor", "Doctorescu Matei");
 
         assertEquals(7, ur.size());
         assertEquals(show + "Doctor ID: 6\n" +

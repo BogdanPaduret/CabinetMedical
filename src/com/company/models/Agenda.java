@@ -1,8 +1,6 @@
 package com.company.models;
 
-import com.company.helpers.Utils;
-import com.company.repositories.AppointmentRepository;
-import com.company.repositories.UserRepository;
+import com.company.helpers.RepositoryLoad;
 
 import java.util.*;
 
@@ -19,7 +17,7 @@ public class Agenda {
     public Agenda(String usersPath,String appointmentsPath) {
         appointmentMap = new TreeMap<>();
 
-        matchDoctorsAppointments(Utils.userRepository.getAll(), Utils.appointmentRepository.getAll());
+        matchDoctorsAppointments(RepositoryLoad.userRepository.getAll(), RepositoryLoad.appointmentRepository.getAll());
     }
     public Agenda(Map<Doctor, Set<Appointment>> appointmentMap) {
         this.appointmentMap = appointmentMap;
@@ -123,7 +121,7 @@ public class Agenda {
     }
 
     private Doctor getDoctorById(int id) {
-        User user = Utils.userRepository.get(id);
+        User user = RepositoryLoad.userRepository.get(id);
         if (user instanceof Doctor doctor) {
             return doctor;
         }

@@ -1,9 +1,7 @@
 package com.company.repositories;
 
-import com.company.models.Doctor;
-import com.company.models.Patient;
-import com.company.models.Secretary;
-import com.company.models.User;
+import com.company.helpers.Utils;
+import com.company.models.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -16,20 +14,24 @@ import static com.company.helpers.Utils.*;
 public class UserRepository implements Repository<User>{
 
     //instance variables
-    private Hashtable<String, Collection<User>> hashtable;
+    private Hashtable<String, Set> usersHashtable;
     private TreeSet<User> users;
     private String path;
 
     //constructor
-    public UserRepository(String path) {
+    private void init(String path) {
         this.users = new TreeSet<>();
         this.path = path;
+        usersHashtable= createEmptyUserSetsHashtable();
+    }
+    public UserRepository(String path) {
+        init(path);
         this.load();
     }
     public UserRepository(String path, Collection<User> users) {
-        this.users = new TreeSet<>();
+        init(path);
         this.users.addAll(users);
-        this.path = path;
+        splitUsers();
     }
 
     //create
@@ -52,8 +54,8 @@ public class UserRepository implements Repository<User>{
         add(user.getType(), user.getUserName());
     }
     public void add(String type, String name) {
-        if (checkUserType(type)) {
-            users.add(createUser(type, generateNewId(), name));
+        if (Utils.checkUserType(type)) {
+            users.add(Utils.createUser(type, generateNewId(), name));
         } else {
             throw new NoSuchElementException("Acest tip de utilizator nu exista.");
         }
@@ -68,24 +70,16 @@ public class UserRepository implements Repository<User>{
 
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
-                User user = createUser(line);
+                User user = Utils.createUser(line);
                 if (user != null) {
                     try {
-                        users.add(user);
+                        this.users.add(user);
                     } catch (ClassCastException e) {
                         e.printStackTrace();
                     }
 
-                    //todo de terminat codul pentru a umple hashtable-ul cu 3 intrari: 3 chei String doctor, patient, secretary si ca valori
-                    if (user instanceof Doctor doctor) {
-                        Set<User> doctors = new TreeSet<>();
-                        if (hashtable.containsKey(USER_DOCTOR)) {
-                            doctors.addAll(hashtable.get(USER_DOCTOR));
-                        }
-                        doctors.add(doctor);
-                        hashtable.remove(USER_DOCTOR);
-                        hashtable.put(USER_DOCTOR, doctors);
-                    }
+                    //code pentru a umple hashtable-ul cu utilizatori diferiti
+                    sublistUser(user);
 
                 }
             }
@@ -117,17 +111,10 @@ public class UserRepository implements Repository<User>{
     public Set<User> getAll() {
         return users;
     }
-//    public Set<User> getAll(User user) {
-//        Set<User> userSubset = new TreeSet<>();
-//        Iterator<User> iterator = users.iterator();
-//        while (iterator.hasNext()) {
-//            User u = iterator.next();
-//            if (user instanceof user.getClass()) {
-//                userSubset.add(user);
-//            }
-//        }
-//        return userSubset;
-//    }
+    public Set getAll(String type) {
+        return usersHashtable.get(type);
+    }
+
     public boolean exists(int id, String name) {
         for (User user : users) {
             if (user.getUserId() == id && user.getUserName().equals(name)) {
@@ -193,5 +180,21 @@ public class UserRepository implements Repository<User>{
     public int generateNewId() {
         return users.last().getUserId() + 1;
     }
+    private void splitUsers() {
+        for (User user : users) {
+            sublistUser(user);
+        }
+    }
+    private void sublistUser(User user) {
+        for (int i = 0; i < USERS_ARRAY.length; i++) {
+            if (user.getClass().getSimpleName().equals(USERS_ARRAY[i])) {
+                if (usersHashtable.containsKey(USERS_ARRAY[i])) {
+                    usersHashtable.get(USERS_ARRAY[i]).add(user);
+                }
+            }
+        }
+
+    }
+
 
 }

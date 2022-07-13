@@ -1,15 +1,15 @@
 package com.company.views;
 
+import com.company.helpers.RepositoryLoad;
 import com.company.helpers.Utils;
 import com.company.models.Doctor;
 import com.company.models.Patient;
 import com.company.models.Secretary;
 import com.company.models.User;
-import com.company.repositories.UserRepository;
 
 import java.util.*;
 
-import static com.company.helpers.Utils.*;
+import static com.company.helpers.RepositoryLoad.*;
 
 public class ViewLogIn implements View {
 
@@ -22,7 +22,7 @@ public class ViewLogIn implements View {
         String usersPath = repositoriesPath + "/users";
         String appointmentsPath = repositoriesPath + "/appointments";
 
-        Utils.pathInit(usersPath, appointmentsPath);
+        RepositoryLoad.pathInit(usersPath, appointmentsPath);
 
         user = null;
     }
@@ -55,7 +55,7 @@ public class ViewLogIn implements View {
         this.play("");
     }
     public void play(String inputStrings) {
-        Scanner scanner = getScanner(inputStrings);
+        Scanner scanner = Utils.getScanner(inputStrings);
 
         boolean running = true;
         int choice = -1;
@@ -93,7 +93,7 @@ public class ViewLogIn implements View {
         System.out.println("Sigur iesiti din aplicatie?");
         char ans = scanner.nextLine().toLowerCase().charAt(0);
         if (ans == 'y') {
-            toSaveOrNotToSaveUsers(scanner);
+            Utils.toSaveOrNotToSaveUsers(scanner);
             return true;
         }
         return false;
@@ -151,7 +151,7 @@ public class ViewLogIn implements View {
         String abort = "Date incorecte! Nu s-a creat nici un utilizator nou.";
 
         String type = input[0];
-        if (input.length != 2 || !checkUserType(type)) {
+        if (input.length != 2 || !Utils.checkUserType(type)) {
             System.out.println(abort);
         } else {
             String name = input[1];
@@ -161,7 +161,7 @@ public class ViewLogIn implements View {
     }
 
     private void setUser(int id, String name) throws NoSuchElementException {
-        for (User proxy : Utils.userRepository.getAll()) {
+        for (User proxy : RepositoryLoad.userRepository.getAll()) {
             if (proxy.getUserId() == id && proxy.getUserName().equals(name)) {
                 user = proxy;
             }

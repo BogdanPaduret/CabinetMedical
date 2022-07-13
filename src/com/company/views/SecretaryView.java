@@ -1,8 +1,6 @@
 package com.company.views;
 
 import com.company.models.Secretary;
-import com.company.repositories.AppointmentRepository;
-import com.company.repositories.UserRepository;
 
 import java.util.Scanner;
 
