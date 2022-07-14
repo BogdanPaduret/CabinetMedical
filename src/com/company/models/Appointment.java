@@ -160,8 +160,8 @@ public class Appointment implements Serializable, Comparable<Appointment> {
         duration = duration.minusHours(hours);
         int minutes = (int) duration.toMinutes();
 
-        String string = "";
-        string += "Appointment of patient with ID " + patientId + " with doctor with ID " + doctorId + ":";
+        String string = "Appointment #"+appointmentId;
+        string += "\nAppointment of patient with ID " + patientId + " with doctor with ID " + doctorId + ":";
         string += "\nStarts on " + startDate.format(formatter);
         string += "\nEnds on " + endDate.format(formatter);
         string += "\nDuration:";

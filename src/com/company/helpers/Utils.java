@@ -1,5 +1,6 @@
 package com.company.helpers;
 
+import com.company.exceptions.AppointmentDoesNotExistException;
 import com.company.exceptions.AppointmentFailedException;
 import com.company.models.*;
 import com.company.repositories.Observed;
@@ -51,6 +52,10 @@ public final class Utils {
         } else {
             throw new AppointmentFailedException();
         }
+
+    }
+
+    public static void updateAppointment(int id, Appointment appointment) {
 
     }
 

@@ -1,5 +1,6 @@
 package com.company.repositories;
 
+import com.company.exceptions.AppointmentDoesNotExistException;
 import com.company.exceptions.AppointmentFailedException;
 import com.company.helpers.RepositoryLoad;
 import com.company.helpers.Utils;
@@ -150,8 +151,12 @@ public class AppointmentRepository implements Repository<Appointment>{
     }
     @Override
     public void remove(Appointment appointment) {
-        appointments.remove(appointment);
-        notifyOnChangeObservers();
+        if (appointments.remove(appointment)) {
+            notifyOnChangeObservers();
+        } else {
+            throw new AppointmentDoesNotExistException();
+        }
+
     }
 
     //observer pattern

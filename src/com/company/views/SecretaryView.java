@@ -1,5 +1,6 @@
 package com.company.views;
 
+import com.company.exceptions.AppointmentDoesNotExistException;
 import com.company.exceptions.AppointmentFailedException;
 import com.company.exceptions.DoctorDoesNotExistException;
 import com.company.helpers.RepositoryLoad;
@@ -12,6 +13,7 @@ import com.company.repositories.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static com.company.helpers.Constants.*;
@@ -62,8 +64,23 @@ public class SecretaryView implements View {
                 default -> {}
                 case 0 -> running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
                 case 1 -> createAppointment(scanner);
-                case 2 -> cancelAppointment(scanner);
-                case 3 -> modifyAppointment(scanner);
+                case 2 -> {
+                    try {
+                        cancelAppointment(scanner);
+                        System.out.println("Programarea a fost anulata cu succes.");
+                    } catch (Exception e) {
+//                        e.printStackTrace();
+                        System.out.println("Programarea nu exista. Verificati daca datele introduse sunt corecte.");
+                    }
+                }
+                case 3 -> {
+                    try {
+                        modifyAppointment(scanner);
+                    } catch (Exception e) {
+//                        e.printStackTrace();
+                        System.out.println("A aparut o eroare. Verificati daca datele introduse sunt corecte.");
+                    }
+                }
                 case 9 -> RepositoryLoad.appointmentRepository.show();
             }
 
@@ -76,6 +93,18 @@ public class SecretaryView implements View {
         createAppointment(scanner, -1);
     }
     private void createAppointment(Scanner scanner,int appointmentId) {
+        try {
+            RepositoryLoad.appointmentRepository.add(enquireAppointmentDetails(scanner, appointmentId));
+        } catch (AppointmentFailedException e) {
+            System.out.println(
+                    "Programarea nu poate fi facuta cu acest medic in acest interval orar." +
+                    "\nAlegeti un alt doctor sau un alt interval orar."
+            );
+        }
+
+    }
+
+    private Appointment enquireAppointmentDetails(Scanner scanner, int appointmentId) {
         System.out.println("Introduceti numele pacientului si numele doctorului separate prin virgula");
         String[] input = scanner.nextLine().split(STRING_SEPARATOR);
         String patientName = input[0];
@@ -99,8 +128,8 @@ public class SecretaryView implements View {
         }
 
         int startHour = 0;
-        int startMinute=0;
-        while (startHour * startMinute == 0) {
+        int startMinute=-1;
+        while (startHour == 0 || startMinute<0) {
             System.out.println("Introduceti ora si minutul programarii separate prin ':'");
             input = scanner.nextLine().split(":");
             try {
@@ -128,21 +157,15 @@ public class SecretaryView implements View {
         LocalDateTime startDate = LocalDateTime.of(year, month, day, startHour, startMinute);
         LocalDateTime endDate = startDate.plusMinutes(duration);
 
-        try {
-            RepositoryLoad.appointmentRepository.add(new Appointment(appointmentId, doctorId, patientId, startDate, endDate));
-        } catch (AppointmentFailedException e) {
-            System.out.println(
-                    "Programarea nu poate fi facuta cu acest medic in acest interval orar." +
-                    "\nAlegeti un alt doctor sau un alt interval orar."
-            );
-        }
-
+        return new Appointment(appointmentId, doctorId, patientId, startDate, endDate);
     }
 
     private void cancelAppointment(Scanner scanner) {
+        boolean isRemoved = false;
         System.out.println("Introduceti numele doctorului sau ID-ul programarii");
         String input = scanner.nextLine();
         int appointmentId = parseInteger(input, -1);
+        String successfulCancel = "Programarea a fost anulata cu succes";
 
         if (appointmentId == -1) {
             String doctorName = input;
@@ -177,11 +200,16 @@ public class SecretaryView implements View {
                     Appointment appointment = iterator.next();
                     if (appointment.getStartDate().equals(startDate)) {
                         RepositoryLoad.appointmentRepository.remove(appointment);
+                        isRemoved = true;
                     }
                 }
             }
         } else {
             cancelAppointment(appointmentId);
+            isRemoved = true;
+        }
+        if (!isRemoved) {
+            throw new AppointmentDoesNotExistException();
         }
     }
     private void cancelAppointment(int id) {
@@ -193,8 +221,18 @@ public class SecretaryView implements View {
         int appointmentId = parseInteger(scanner.nextLine(), -1);
 
         if (appointmentId != -1) {
-            cancelAppointment(appointmentId);
-            createAppointment(scanner,appointmentId);
+            modifyAppointment(appointmentId,scanner);
+        } else {
+            throw new AppointmentDoesNotExistException();
+        }
+    }
+    private void modifyAppointment(int appointmentId, Scanner scanner) {
+        Appointment appointment = enquireAppointmentDetails(scanner, appointmentId);
+        try {
+            RepositoryLoad.appointmentRepository.set(appointmentId, appointment);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Eroare la modificare.");
         }
     }
 
@@ -213,9 +251,14 @@ public class SecretaryView implements View {
     }
 
     private int multiplyIntArray(int[] array) {
-        int r = 1;
-        for (int i = 0; i < array.length; i++) {
-            r = r * array[i];
+        int r;
+        if (array.length > 0) {
+            r = 1;
+            for (int i = 0; i < array.length; i++) {
+                r = r * array[i];
+            }
+        } else {
+            r = 0;
         }
         return r;
     }
@@ -224,7 +267,6 @@ public class SecretaryView implements View {
         try {
             return Integer.parseInt(string);
         } catch (NumberFormatException e) {
-            e.printStackTrace();
             return valueOnException;
         }
     }
