@@ -3,6 +3,7 @@ package com.company.repositories;
 import com.company.models.Appointment;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -85,6 +86,45 @@ class AppointmentRepositoryTest {
         assertEquals(path, ar.getPath());
         ar.load();
         assertEquals(4, ar.size());
+    }
+
+    @Test
+    public void dateTest() {
+        LocalDateTime a = LocalDateTime.of(2022, 9, 11, 20, 30);
+        LocalDateTime b = LocalDateTime.of(2022, 9, 11, 21, 0);
+
+        LocalDateTime d1 = LocalDateTime.of(2022, 9, 11, 20, 45);
+        LocalDateTime d2 = LocalDateTime.of(2022, 9, 11, 20, 15);
+        LocalDateTime d3 = LocalDateTime.of(2022, 9, 11, 21, 15);
+
+        /*
+        order d2,a,d1,b,d3
+        d2
+        a
+        d1
+        b
+        d3
+         */
+
+
+        int ad1 = a.compareTo(d1); // -
+        int ad2 = a.compareTo(d2); // +
+        int ad3 = a.compareTo(d3); // -
+
+        int d1b = d1.compareTo(b); // -
+        int d2b = d2.compareTo(b); // -
+        int d3b = d3.compareTo(b); // +
+
+        int ad1b = ad1 * d1b;
+        int ad2b = ad2 * d2b;
+        int ad3b = ad3 * d3b;
+
+        int[] val = {ad1, ad2, ad3, 999, d1b, d2b, d3b, 999, ad1b, ad2b, ad3b};
+
+        for (int i = 0; i < val.length; i++) {
+            System.out.println(val[i]);
+        }
+
     }
 
 }

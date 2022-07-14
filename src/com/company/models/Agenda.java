@@ -8,22 +8,25 @@ public class Agenda {
     //contine id doctor si id programare
 
     //instance variables
-    private Map<Doctor, Set<Appointment>> appointmentMap;
+    private Map<Doctor, Set<Appointment>> doctorAppointmentsMap;
+    private Map<Doctor, Set<Patient>> doctorPatientsMap;
+    private Map<Patient, Set<Doctor>> patientDoctorsMap;
+    private Map<Patient, Set<Appointment>> patientAppointmentsMap;
 
     //constructor
     public Agenda(String usersPath,String appointmentsPath) {
-        appointmentMap = new TreeMap<>();
+        doctorAppointmentsMap = new TreeMap<>();
 
         matchDoctorsAppointments(RepositoryLoad.userRepository.getAll(), RepositoryLoad.appointmentRepository.getAll());
     }
-    public Agenda(Map<Doctor, Set<Appointment>> appointmentMap) {
-        this.appointmentMap = appointmentMap;
+    public Agenda(Map<Doctor, Set<Appointment>> doctorAppointmentsMap) {
+        this.doctorAppointmentsMap = doctorAppointmentsMap;
     }
 
     //create
     public void addAppointment(Doctor doctor, Appointment appointment) {
-        if (appointmentMap.containsKey(doctor)) {
-            Set<Appointment> appointments = appointmentMap.get(doctor);
+        if (doctorAppointmentsMap.containsKey(doctor)) {
+            Set<Appointment> appointments = doctorAppointmentsMap.get(doctor);
             if (appointments == null) {
                 appointments = new TreeSet<>();
             }
@@ -38,13 +41,13 @@ public class Agenda {
 
     //read
     public Collection<Appointment> getDoctorAppointments(Doctor doctor) {
-        return appointmentMap.get(doctor);
+        return doctorAppointmentsMap.get(doctor);
     }
 
     //update
     public void updateAppointment(Doctor doctor, int appointmentId, Appointment appointment) {
-        if (appointmentMap.containsKey(doctor)) {
-            Set<Appointment> appointments = appointmentMap.get(doctor);
+        if (doctorAppointmentsMap.containsKey(doctor)) {
+            Set<Appointment> appointments = doctorAppointmentsMap.get(doctor);
             Iterator<Appointment> iterator = appointments.iterator();
             while (iterator.hasNext()) {
                 Appointment a = iterator.next();
@@ -67,8 +70,8 @@ public class Agenda {
 
     //delete
     public void removeAppointment(Doctor doctor, Appointment appointment) {
-        if (appointmentMap.containsKey(doctor)) {
-            Set<Appointment> appointments = appointmentMap.get(doctor);
+        if (doctorAppointmentsMap.containsKey(doctor)) {
+            Set<Appointment> appointments = doctorAppointmentsMap.get(doctor);
             if (appointments.contains(appointment)) {
                 appointments.remove(appointment);
                 refreshMap(doctor, appointments);
@@ -92,7 +95,7 @@ public class Agenda {
             }
             if (doctor != null) {
                 doctorAppointments = matchAppointments(doctor, appointments);
-                appointmentMap.put(doctor, doctorAppointments);
+                doctorAppointmentsMap.put(doctor, doctorAppointments);
             }
         }
     }
@@ -113,8 +116,8 @@ public class Agenda {
     }
 
     private void refreshMap(Doctor doctor, Set<Appointment> appointments) {
-        appointmentMap.remove(doctor);
-        appointmentMap.put(doctor, appointments);
+        doctorAppointmentsMap.remove(doctor);
+        doctorAppointmentsMap.put(doctor, appointments);
     }
 
     private Doctor getDoctorById(int id) {

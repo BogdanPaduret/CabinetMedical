@@ -220,7 +220,7 @@ public class UserRepository implements Repository<User>{
 
         return string;
     }
-    public int generateNewId() {
+    private int generateNewId() {
         try {
             return users.last().getUserId() + 1;
         } catch (NoSuchElementException e) {

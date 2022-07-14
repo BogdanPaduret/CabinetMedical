@@ -1,14 +1,18 @@
 package com.company.repositories;
 
+import com.company.exceptions.AppointmentFailedException;
+import com.company.helpers.RepositoryLoad;
+import com.company.helpers.Utils;
 import com.company.models.Appointment;
 import com.company.views.Observer;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class AppointmentRepository implements Repository<Appointment>{
 
-    private Set<Appointment> appointments;
+    private TreeSet<Appointment> appointments;
     private String path;
 
     private ArrayList<Observer> observers;
@@ -41,7 +45,27 @@ public class AppointmentRepository implements Repository<Appointment>{
     }
     @Override
     public void add(Appointment appointment) {
-        appointments.add(appointment);
+        this.add(
+                appointment.getDoctorId(),
+                appointment.getPatientId(),
+                appointment.getStartDate(),
+                appointment.getEndDate()
+        );
+        notifyObservers();
+    }
+    public void add(
+            int doctorId,
+            int patientId,
+            LocalDateTime startDate,
+            LocalDateTime endDate
+    ) {
+        if (RepositoryLoad.isAppointmentAvailable(doctorId, patientId, startDate, endDate)) {
+            try {
+                appointments.add(Utils.createAppointment(generateNewId(), doctorId, patientId, startDate, endDate));
+            } catch (AppointmentFailedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     //read
@@ -106,10 +130,12 @@ public class AppointmentRepository implements Repository<Appointment>{
                 a.set(appointment);
             }
         }
+        notifyObservers();
     }
     @Override
     public void addAll(Collection<Appointment> appointments) {
         this.appointments.addAll(appointments);
+        notifyObservers();
     }
     public void setPath(String path) {
         this.path = path;
@@ -119,10 +145,12 @@ public class AppointmentRepository implements Repository<Appointment>{
     @Override
     public void clear() {
         appointments.clear();
+        notifyObservers();
     }
     @Override
     public void remove(Appointment appointment) {
         appointments.remove(appointment);
+        notifyObservers();
     }
 
     //observer pattern
@@ -138,6 +166,15 @@ public class AppointmentRepository implements Repository<Appointment>{
     public void notifyObservers() {
         for (int i = 0; i < observers.size(); i++) {
             observers.get(i).update(this);
+        }
+    }
+
+    //helpers
+    private int generateNewId() {
+        try {
+            return appointments.last().getAppointmentId() + 1;
+        } catch (NoSuchElementException e) {
+            return 0;
         }
     }
 }

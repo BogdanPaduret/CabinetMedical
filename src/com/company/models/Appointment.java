@@ -20,11 +20,20 @@ public class Appointment implements Serializable, Comparable<Appointment> {
     private transient LocalDateTime endDate;
 
     //constructor
+    private void init(int appointmentId,
+                      int doctorId,
+                      int patientId) {
+        this.appointmentId = appointmentId;
+        this.doctorId = doctorId;
+        this.patientId = patientId;
+    }
     public Appointment(int appointmentId,
                        int doctorId,
                        int patientId,
                        String startDate,
                        String endDate) {
+
+        init(appointmentId, doctorId, patientId);
 
         String[] start = startDate.split(STRING_SEPARATOR);
         String[] end = endDate.split(STRING_SEPARATOR);
@@ -41,9 +50,6 @@ public class Appointment implements Serializable, Comparable<Appointment> {
         int ehh = Integer.parseInt(end[3]);
         int emin = Integer.parseInt(end[4]);
 
-        this.appointmentId = appointmentId;
-        this.doctorId = doctorId;
-        this.patientId = patientId;
         this.startDate = LocalDateTime.of(syy, smm, sdd, shh, smin);
         this.endDate = LocalDateTime.of(eyy, emm, edd, ehh, emin);
     }
@@ -62,11 +68,22 @@ public class Appointment implements Serializable, Comparable<Appointment> {
                        int endHour,
                        int endMinute) {
 
-        this.appointmentId = appointmentId;
-        this.doctorId = doctorId;
-        this.patientId = patientId;
+        init(appointmentId, doctorId, patientId);
+
         this.startDate = LocalDateTime.of(startYear, startMonth, startDay, startHour, startMinute);
         this.endDate = LocalDateTime.of(endYear, endMonth, endDay, endHour, endMinute);
+    }
+
+    public Appointment(int appointmentId,
+                       int doctorId,
+                       int patientId,
+                       LocalDateTime startDate,
+                       LocalDateTime endDate) {
+
+        init(appointmentId, doctorId, patientId);
+
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     //create

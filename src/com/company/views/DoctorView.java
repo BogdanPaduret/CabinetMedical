@@ -1,5 +1,6 @@
 package com.company.views;
 
+import com.company.helpers.RepositoryLoad;
 import com.company.helpers.Utils;
 import com.company.models.*;
 import com.company.repositories.Observed;
@@ -21,6 +22,8 @@ public class DoctorView implements View {
     //constructor
     public DoctorView(Doctor doctor) {
         this.doctor = doctor;
+        Agenda agenda = new Agenda(RepositoryLoad.userRepository.getPath(), RepositoryLoad.appointmentRepository.getPath());
+        appointments.addAll(agenda.getDoctorAppointments(doctor));
     }
 
     //menu
@@ -30,7 +33,6 @@ public class DoctorView implements View {
         string += "Logat ca doctor " + doctor.getUserName();
         string += "\nApasati 1 pentru a vedea programarile";
         string += "\nApasati 2 pentru a inchide o programare";
-        string += "\nApasati 3 pentru a crea o noua programare";
         string += "\nApasati 0 pentru a iesi";
 
         System.out.println(string);
@@ -56,20 +58,10 @@ public class DoctorView implements View {
             }
 
             switch (choice) {
-                default:
-                    break;
-                case 0:
-                    running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
-                    break;
-                case 1:
-                    showDoctorAppointments();
-                    break;
-                case 2:
-                    closeAppointment();
-                    break;
-                case 3:
-                    createAppointment();
-                    break;
+                default -> {}
+                case 0 -> running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
+                case 1 -> showDoctorAppointments();
+                case 2 -> closeAppointment();
             }
         }
     }
@@ -85,10 +77,6 @@ public class DoctorView implements View {
     }
 
     private void closeAppointment() {
-
-    }
-
-    private void createAppointment() {
 
     }
 

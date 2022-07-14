@@ -1,12 +1,11 @@
 package com.company.helpers;
 
-import com.company.models.Doctor;
-import com.company.models.Patient;
-import com.company.models.Secretary;
-import com.company.models.User;
+import com.company.exceptions.AppointmentFailedException;
+import com.company.models.*;
 import com.company.repositories.Observed;
 import com.company.repositories.Repository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static com.company.helpers.Constants.*;
@@ -41,6 +40,18 @@ public final class Utils {
             case USER_SECRETARY:
                 return new Secretary(id, name);
         }
+    }
+
+    //appointments
+    public static Appointment createAppointment(int appointmentId, int doctorId, int patientId, LocalDateTime startDate, LocalDateTime endDate)
+            throws AppointmentFailedException {
+
+        if (RepositoryLoad.isAppointmentAvailable(doctorId, patientId, startDate, endDate)) {
+            return new Appointment(appointmentId, doctorId, patientId, startDate, endDate);
+        } else {
+            throw new AppointmentFailedException();
+        }
+
     }
 
     //misc
