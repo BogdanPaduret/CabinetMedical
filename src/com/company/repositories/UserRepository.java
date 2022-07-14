@@ -49,6 +49,7 @@ public class UserRepository implements Repository<User>{
         } catch (Exception e) {
             e.printStackTrace();
         }
+        notifyOnSaveObservers();
     }
     @Override
     public void add(User user)
@@ -59,7 +60,7 @@ public class UserRepository implements Repository<User>{
             throws NoUserTypeException {
         if (Utils.typeExists(type)) {
             users.add(Utils.createUser(type, generateNewId(), name));
-            notifyObservers();
+            notifyOnChangeObservers();
         } else {
             throw new NoUserTypeException();
         }
@@ -108,6 +109,16 @@ public class UserRepository implements Repository<User>{
             }
         }
         throw new NoSuchElementException();
+    }
+    public int getId(String name) {
+        Iterator<User> iterator = users.iterator();
+        while (iterator.hasNext()) {
+            User user = iterator.next();
+            if (user.getUserName().equals(name)) {
+                return user.getUserId();
+            }
+        }
+        return -1;
     }
     @Override
     public Set<User> getAll() {
@@ -165,25 +176,25 @@ public class UserRepository implements Repository<User>{
         if (!updated) {
             throw new NoSuchElementException();
         } else {
-            notifyObservers();
+            notifyOnChangeObservers();
         }
     }
     @Override
     public void addAll(Collection<User> users) {
         this.users.addAll(users);
-        notifyObservers();
+        notifyOnChangeObservers();
     }
 
     //delete
     @Override
     public void clear() {
         users.clear();
-        notifyObservers();
+        notifyOnChangeObservers();
     }
     @Override
     public void remove(User user) {
         users.remove(user);
-        notifyObservers();
+        notifyOnChangeObservers();
     }
 
     //observer pattern
@@ -196,9 +207,15 @@ public class UserRepository implements Repository<User>{
         observers.remove(observer);
     }
     @Override
-    public void notifyObservers() {
+    public void notifyOnChangeObservers() {
         for (int i = 0; i < observers.size(); i++) {
-            observers.get(i).update(this);
+            observers.get(i).updateAdd(this);
+        }
+    }
+    @Override
+    public void notifyOnSaveObservers() {
+        for (int i = 0; i < observers.size(); i++) {
+            observers.get(i).updateRemove(this);
         }
     }
 

@@ -34,7 +34,7 @@ public abstract class User implements Comparable<User> {
         return userName;
     }
 
-    //update
+    //updateAdd
     public void setType(String type) {
         this.type = type;
     }

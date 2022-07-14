@@ -2,6 +2,10 @@ package com.company;
 
 import com.company.views.ViewLogIn;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -10,6 +14,16 @@ public class Main {
 
     public static void viewLogInTest() {
         String rootPath = "test/com/company/repositories";
+
+//        try {
+//            File file = new File(rootPath + "/appointments");
+//            PrintWriter printWriter = new PrintWriter(file);
+//            printWriter.print("");
+//            printWriter.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
         ViewLogIn logIn = new ViewLogIn(rootPath);
         logIn.play();
     }
@@ -19,16 +33,13 @@ public class Main {
      - ViewLogIn
         full test
      - UserRepository
-        subListUser() are ceva avertisment "Raw user of parameterized type" pe care nu stiu sa-l rezolv ca sa nu crape codul :)
         full test except load()
      - DoctorView
-        toSaveOrNotToSave()
         closeAppointment()
         createAppointment()
         full test
      - PatientView
         (everything)
-        should also have access to appointments path, not just users path!
      */
 
 }

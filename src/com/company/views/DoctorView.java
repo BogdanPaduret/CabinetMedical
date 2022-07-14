@@ -90,6 +90,8 @@ public class DoctorView implements View {
         }
         throw new NoSuchElementException("Patient with ID: " + id + " does not exist");
     }
+
+    //cod duplicat pentru durata programarii
     private String doctorAppointmentString(Appointment appointment) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy HH:mm a");
 

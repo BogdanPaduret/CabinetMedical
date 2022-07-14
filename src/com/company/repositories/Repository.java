@@ -20,7 +20,7 @@ public interface Repository<T> extends Observed {
 
     Collection<T> getAll();
 
-    //update
+    //updateAdd
     void set(int id, T data);
 
     void addAll(Collection<T> collection);

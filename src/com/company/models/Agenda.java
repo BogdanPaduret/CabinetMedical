@@ -44,7 +44,7 @@ public class Agenda {
         return doctorAppointmentsMap.get(doctor);
     }
 
-    //update
+    //updateAdd
     public void updateAppointment(Doctor doctor, int appointmentId, Appointment appointment) {
         if (doctorAppointmentsMap.containsKey(doctor)) {
             Set<Appointment> appointments = doctorAppointmentsMap.get(doctor);

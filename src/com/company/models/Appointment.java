@@ -162,9 +162,9 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 
         String string = "";
         string += "Appointment of patient with ID " + patientId + " with doctor with ID " + doctorId + ":";
-        string += "Starts on " + startDate.format(formatter) + "\n";
-        string += "Ends on " + endDate.format(formatter) + "\n";
-        string += "Duration:";
+        string += "\nStarts on " + startDate.format(formatter);
+        string += "\nEnds on " + endDate.format(formatter);
+        string += "\nDuration:";
         if (days != 0) {
             string += " " + days + " days";
         }
@@ -193,7 +193,7 @@ public class Appointment implements Serializable, Comparable<Appointment> {
         return this.startDate.compareTo(o.startDate);
     }
 
-    //update
+    //updateAdd
     public void setAppointmentId(int appointmentId) {
         this.appointmentId = appointmentId;
     }

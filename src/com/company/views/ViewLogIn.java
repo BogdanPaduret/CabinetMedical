@@ -47,6 +47,9 @@ public class ViewLogIn implements View {
         if (user != null) {
             string += "\nApasati 3 pentru a intra in aplicatie ca " + user.getUserName();
         }
+        if (!changedRepositories.isEmpty()) {
+            string += "\nApasati 9 pentru a salva modificarile";
+        }
 
         string += "\nApasati 0 pentru a iesi";
 
@@ -86,6 +89,9 @@ public class ViewLogIn implements View {
                     break;
                 case 2:
                     register(scanner);
+                    break;
+                case 9:
+                    Utils.toSaveOrNotToSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
                     break;
             }
         }

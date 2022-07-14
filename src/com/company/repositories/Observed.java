@@ -8,6 +8,8 @@ public interface Observed {
 
     void removeObserver(Observer observer);
 
-    void notifyObservers();
+    void notifyOnChangeObservers();
+
+    void notifyOnSaveObservers();
 
 }

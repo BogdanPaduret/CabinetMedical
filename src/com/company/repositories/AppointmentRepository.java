@@ -42,6 +42,7 @@ public class AppointmentRepository implements Repository<Appointment>{
         } catch (IOException e) {
             e.printStackTrace();
         }
+        notifyOnSaveObservers();
     }
     @Override
     public void add(Appointment appointment) {
@@ -51,20 +52,18 @@ public class AppointmentRepository implements Repository<Appointment>{
                 appointment.getStartDate(),
                 appointment.getEndDate()
         );
-        notifyObservers();
+        notifyOnChangeObservers();
     }
     public void add(
             int doctorId,
             int patientId,
             LocalDateTime startDate,
             LocalDateTime endDate
-    ) {
+    ) throws AppointmentFailedException{
         if (RepositoryLoad.isAppointmentAvailable(doctorId, patientId, startDate, endDate)) {
-            try {
-                appointments.add(Utils.createAppointment(generateNewId(), doctorId, patientId, startDate, endDate));
-            } catch (AppointmentFailedException e) {
-                e.printStackTrace();
-            }
+            appointments.add(Utils.createAppointment(generateNewId(), doctorId, patientId, startDate, endDate));
+        } else {
+            throw new AppointmentFailedException();
         }
     }
 
@@ -76,6 +75,8 @@ public class AppointmentRepository implements Repository<Appointment>{
             ObjectInputStream ois = new ObjectInputStream(fis);
             appointments = (TreeSet<Appointment>) ois.readObject();
             ois.close();
+        } catch (EOFException e) {
+            System.out.println("Baza de date cu programari este goala");
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
@@ -130,12 +131,12 @@ public class AppointmentRepository implements Repository<Appointment>{
                 a.set(appointment);
             }
         }
-        notifyObservers();
+        notifyOnChangeObservers();
     }
     @Override
     public void addAll(Collection<Appointment> appointments) {
         this.appointments.addAll(appointments);
-        notifyObservers();
+        notifyOnChangeObservers();
     }
     public void setPath(String path) {
         this.path = path;
@@ -145,12 +146,12 @@ public class AppointmentRepository implements Repository<Appointment>{
     @Override
     public void clear() {
         appointments.clear();
-        notifyObservers();
+        notifyOnChangeObservers();
     }
     @Override
     public void remove(Appointment appointment) {
         appointments.remove(appointment);
-        notifyObservers();
+        notifyOnChangeObservers();
     }
 
     //observer pattern
@@ -163,9 +164,15 @@ public class AppointmentRepository implements Repository<Appointment>{
         observers.remove(observer);
     }
     @Override
-    public void notifyObservers() {
+    public void notifyOnChangeObservers() {
         for (int i = 0; i < observers.size(); i++) {
-            observers.get(i).update(this);
+            observers.get(i).updateAdd(this);
+        }
+    }
+    @Override
+    public void notifyOnSaveObservers() {
+        for (int i = 0; i < observers.size(); i++) {
+            observers.get(i).updateRemove(this);
         }
     }
 

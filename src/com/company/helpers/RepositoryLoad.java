@@ -4,16 +4,14 @@ import com.company.exceptions.AppointmentFailedException;
 import com.company.exceptions.DoctorDoesNotExistException;
 import com.company.exceptions.IncorrectDateOrderException;
 import com.company.exceptions.PatientDoesNotExistException;
-import com.company.models.Appointment;
-import com.company.models.Doctor;
-import com.company.models.Patient;
-import com.company.models.User;
+import com.company.models.*;
 import com.company.repositories.AppointmentRepository;
 import com.company.repositories.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 public final class RepositoryLoad<T> {
 
@@ -38,7 +36,7 @@ public final class RepositoryLoad<T> {
 
     //appointment checker
     public static boolean isAppointmentAvailable(int doctorId, int patientId, LocalDateTime startDate, LocalDateTime endDate) {
-        return checkDoctorAndPatientId(doctorId, patientId) && areDatesAvailable(startDate, endDate);
+        return checkDoctorAndPatientId(doctorId, patientId) && areDatesAvailable(doctorId, startDate, endDate);
     }
 
     public static boolean checkDoctorAndPatientId(int doctorId, int patientId) {
@@ -67,7 +65,17 @@ public final class RepositoryLoad<T> {
 
         return existsDoctor && existsPatient;
     }
-    public static boolean areDatesAvailable(LocalDateTime startDate, LocalDateTime endDate) {
+
+    public static boolean areDatesAvailable(int doctorId, LocalDateTime startDate, LocalDateTime endDate) {
+        Agenda agenda = new Agenda(usersPath,appointmentsPath);
+
+        Set<Appointment> appointments = new TreeSet<>(agenda.getDoctorAppointments((Doctor) userRepository.get(doctorId)));
+
+        return areDatesAvailable(appointments, startDate, endDate);
+
+    }
+
+    public static boolean areDatesAvailable(Set<Appointment> appointments, LocalDateTime startDate, LocalDateTime endDate) {
         if (startDate.compareTo(endDate) >= 0) {
             throw new IncorrectDateOrderException();
         }
@@ -76,7 +84,6 @@ public final class RepositoryLoad<T> {
         boolean endDateAvailable = true;
         boolean isEmpty = true;
 
-        Set<Appointment> appointments = appointmentRepository.getAll();
         Iterator<Appointment> iterator = appointments.iterator();
 
         while (iterator.hasNext()) {

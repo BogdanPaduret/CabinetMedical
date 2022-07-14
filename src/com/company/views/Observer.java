@@ -4,6 +4,8 @@ import com.company.repositories.Observed;
 
 public interface Observer {
 
-    void update(Observed observed);
+    void updateAdd(Observed observed);
+
+    void updateRemove(Observed observed);
 
 }

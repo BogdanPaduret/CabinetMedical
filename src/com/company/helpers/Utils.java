@@ -75,11 +75,23 @@ public final class Utils {
 
     //manipulation methods
     public static boolean exitAskSave(Scanner scanner, Repository<?>[] repositories) {
+        if (exit(scanner)) {
+            if (repositories.length != 0) {
+                toSaveOrNotToSave(scanner, repositories);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean exit(Scanner scanner) {
         System.out.println("Sigur iesiti din aplicatie?");
         char ans = scanner.nextLine().toLowerCase().charAt(0);
         if (ans == 'y') {
-            toSaveOrNotToSave(scanner, repositories);
             return true;
+        }
+        if (ans == 'q') {
+            System.exit(0);
         }
         return false;
     }
@@ -111,9 +123,19 @@ public final class Utils {
         return truth;
     }
 
-    public static void updateRepositoryListAfterChange(List<Repository<?>> repositories, Observed observed) {
+    public static void addToRepositoryListAfterChange(List<Repository<?>> repositories, Observed observed) {
         try {
-            repositories.add((Repository<?>) observed);
+            if (!repositories.contains((Repository<?>) observed)) {
+                repositories.add((Repository<?>) observed);
+            }
+        } catch (ClassCastException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void removeFromRepositoryListAfterSave(List<Repository<?>> repositories, Observed observed) {
+        try {
+            repositories.remove((Repository<?>) observed);
         } catch (ClassCastException e) {
             e.printStackTrace();
         }
