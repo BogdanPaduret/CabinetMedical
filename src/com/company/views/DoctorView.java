@@ -64,6 +64,7 @@ public class DoctorView implements View {
                 case 2 -> {
                     try {
                         closeAppointment(scanner);
+                        System.out.println("Programare inchisa cu succes.");
                     } catch (AppointmentFailedException e) {
                         e.printStackTrace();
                         System.out.println(
@@ -86,9 +87,9 @@ public class DoctorView implements View {
             appointments.addAll(agenda.getDoctorAppointments(doctor));
             int size = appointments.size();
             if (size > 0) {
-                System.out.println("Programarile doctorului "+doctor.getUserName().toUpperCase()+" sunt:\n");
+                System.out.println("Programarile doctorului "+doctor.getUserName().toUpperCase()+" sunt:");
                 for (Appointment appointment : appointments) {
-                    System.out.println(doctorAppointmentString(appointment));
+                    System.out.println("\n" + doctorAppointmentString(appointment));
                 }
             } else {
                 System.out.println("Doctorul " + doctor.getUserName() + " nu are nicio programare");
