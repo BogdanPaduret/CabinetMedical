@@ -3,14 +3,12 @@ package com.company.views;
 import com.company.helpers.RepositoryLoad;
 import com.company.helpers.Utils;
 import com.company.models.*;
-import com.company.repositories.Observed;
 import com.company.repositories.Repository;
 
 import java.util.*;
 
 import static com.company.helpers.Constants.USER_DOCTOR;
 import static com.company.helpers.Utils.getScanner;
-import static com.company.helpers.Utils.showAllUsersByType;
 
 public class PatientView implements View {
 
@@ -64,7 +62,7 @@ public class PatientView implements View {
     private void showPatientAppointments() {
         Agenda agenda = new Agenda(RepositoryLoad.userRepository.getPath(), RepositoryLoad.appointmentRepository.getPath());
         try {
-            List<Appointment> appointments = new ArrayList<>(agenda.getPatientAppointments(patient));
+            List<Appointment> appointments = new ArrayList<>(agenda.getUserAppointments(patient));
 
             int size = appointments.size();
             if (size > 0) {

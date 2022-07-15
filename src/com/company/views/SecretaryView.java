@@ -198,7 +198,7 @@ public class SecretaryView implements View {
 
             Agenda agenda = new Agenda(RepositoryLoad.userRepository.getPath(), RepositoryLoad.appointmentRepository.getPath());
 
-            Iterator<Appointment> iterator = agenda.getDoctorAppointments(doctor).iterator();
+            Iterator<Appointment> iterator = agenda.getUserAppointments(doctor).iterator();
             if (doctor != null) {
                 while (iterator.hasNext()) {
                     Appointment appointment = iterator.next();

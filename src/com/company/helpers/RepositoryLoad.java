@@ -1,9 +1,6 @@
 package com.company.helpers;
 
-import com.company.exceptions.AppointmentFailedException;
-import com.company.exceptions.DoctorDoesNotExistException;
 import com.company.exceptions.IncorrectDateOrderException;
-import com.company.exceptions.PatientDoesNotExistException;
 import com.company.models.*;
 import com.company.repositories.AppointmentRepository;
 import com.company.repositories.UserRepository;
@@ -71,7 +68,7 @@ public final class RepositoryLoad<T> {
     public static boolean areDatesAvailable(int doctorId, LocalDateTime startDate, LocalDateTime endDate) {
         Agenda agenda = new Agenda(usersPath,appointmentsPath);
 
-        Set<Appointment> appointments = new TreeSet<>(agenda.getDoctorAppointments((Doctor) userRepository.get(doctorId)));
+        Set<Appointment> appointments = new TreeSet<>(agenda.getUserAppointments((Doctor) userRepository.get(doctorId)));
 
         return areDatesAvailable(appointments, startDate, endDate);
 

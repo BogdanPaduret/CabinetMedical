@@ -5,15 +5,11 @@ import com.company.exceptions.AppointmentFailedException;
 import com.company.helpers.RepositoryLoad;
 import com.company.helpers.Utils;
 import com.company.models.*;
-import com.company.repositories.Observed;
 import com.company.repositories.Repository;
 
-import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.company.helpers.Utils.getScanner;
-import static com.company.helpers.Utils.parseInteger;
 
 public class DoctorView implements View {
 
@@ -84,7 +80,7 @@ public class DoctorView implements View {
         Agenda agenda = new Agenda(RepositoryLoad.userRepository.getPath(), RepositoryLoad.appointmentRepository.getPath());
         try {
             List<Appointment> appointments = new ArrayList<>();
-            appointments.addAll(agenda.getDoctorAppointments(doctor));
+            appointments.addAll(agenda.getUserAppointments(doctor));
             int size = appointments.size();
             if (size > 0) {
                 System.out.println("Programarile doctorului "+doctor.getUserName().toUpperCase()+" sunt:");
