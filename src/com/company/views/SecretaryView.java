@@ -62,7 +62,7 @@ public class SecretaryView implements View {
             }
 
             switch (choice) {
-                default -> {}
+                default -> System.out.println("Optiunea nu exista.\nIncercati din nou.");
                 case 0 -> running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
                 case 1 -> createAppointment(scanner);
                 case 2 -> {

@@ -76,23 +76,15 @@ public class ViewLogIn implements View {
             }
 
             switch (choice) {
-                case 3:
+                default -> System.out.println("Optiunea nu exista.\nIncercati din nou.");
+                case 0 -> running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
+                case 1 -> logIn(scanner);
+                case 2 -> register(scanner);
+                case 3 -> {
                     enterApp();
                     user = null;
-                default:
-                    break;
-                case 0:
-                    running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
-                    break;
-                case 1:
-                    logIn(scanner);
-                    break;
-                case 2:
-                    register(scanner);
-                    break;
-                case 9:
-                    Utils.toSaveOrNotToSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
-                    break;
+                }
+                case 9 -> Utils.toSaveOrNotToSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
             }
         }
     }
