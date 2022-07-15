@@ -92,7 +92,7 @@ public class DoctorView implements View {
                     System.out.println("\n" + doctorAppointmentString(appointment));
                 }
             } else {
-                System.out.println("Doctorul " + doctor.getUserName() + " nu are nicio programare");
+                System.out.println("Doctorul " + doctor.getUserName().toUpperCase() + " nu are nicio programare");
             }
         } catch (Exception e) {
             e.printStackTrace();

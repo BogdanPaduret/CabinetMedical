@@ -31,15 +31,13 @@ public class Main {
     /*
     todo
      - ViewLogIn
-        full test
+        full test in test package
      - UserRepository
-        full test except load()
+        full test in test package except load()
      - DoctorView
-        closeAppointment()
-        createAppointment()
-        full test
+        full test in test package
      - PatientView
-        (everything)
+        full test in test package
      */
 
 }

@@ -45,6 +45,12 @@ public final class Utils {
         }
     }
 
+    public static void showAllUsersByType(String type) {
+        for (User user : RepositoryLoad.userRepository.getAll(type)) {
+            System.out.println(user);
+        }
+    }
+
     //appointments
     public static Appointment createAppointment(int appointmentId, int doctorId, int patientId, LocalDateTime startDate, LocalDateTime endDate)
             throws AppointmentFailedException {

@@ -33,6 +33,9 @@ public class SecretaryView implements View {
         string += "\nApasati 1 pentru a crea o programare";
         string += "\nApasati 2 pentru a anula o programare";
         string += "\nApasati 3 pentru a modifica o programare";
+        string += "\nApasati 6 pentru a vedea toti utilizatorii";
+        string += "\nApasati 7 pentru a vedea toti doctorii";
+        string += "\nApasati 8 pentru a vedea toti pacientii";
         string += "\nApasati 9 pentru a vedea toate programarile";
         string += "\nApasati 0 pentru a iesi";
 
@@ -79,6 +82,9 @@ public class SecretaryView implements View {
                         System.out.println("A aparut o eroare. Verificati daca datele introduse sunt corecte.");
                     }
                 }
+                case 6 -> showAllUsers();
+                case 7 -> showAllDoctors();
+                case 8 -> showAllPatients();
                 case 9 -> RepositoryLoad.appointmentRepository.show();
             }
 
@@ -232,6 +238,21 @@ public class SecretaryView implements View {
             e.printStackTrace();
             System.out.println("Eroare la modificare.");
         }
+    }
+
+    private void showAllUsers() {
+        for (int i = 0; i < USERS_ARRAY.length; i++) {
+            System.out.println("\nToti utilizatorii de tip " + USERS_ARRAY[i].toUpperCase());
+            Utils.showAllUsersByType(USERS_ARRAY[i]);
+        }
+    }
+
+    private void showAllDoctors() {
+        Utils.showAllUsersByType(USER_DOCTOR);
+    }
+
+    private void showAllPatients() {
+        Utils.showAllUsersByType(USER_PATIENT);
     }
 
 

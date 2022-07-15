@@ -4,6 +4,9 @@ import com.company.helpers.RepositoryLoad;
 
 import java.util.*;
 
+import static com.company.helpers.Constants.USER_DOCTOR;
+import static com.company.helpers.Constants.USER_PATIENT;
+
 public class Agenda {
     //contine id doctor si id programare
 
@@ -16,8 +19,9 @@ public class Agenda {
     //constructor
     public Agenda(String usersPath,String appointmentsPath) {
         doctorAppointmentsMap = new TreeMap<>();
+        patientAppointmentsMap = new TreeMap<>();
 
-        matchDoctorsAppointments(RepositoryLoad.userRepository.getAll(), RepositoryLoad.appointmentRepository.getAll());
+        matchUserAppointments(RepositoryLoad.userRepository.getAll(), RepositoryLoad.appointmentRepository.getAll());
     }
     public Agenda(Map<Doctor, Set<Appointment>> doctorAppointmentsMap) {
         this.doctorAppointmentsMap = doctorAppointmentsMap;
@@ -42,6 +46,9 @@ public class Agenda {
     //read
     public Collection<Appointment> getDoctorAppointments(Doctor doctor) {
         return doctorAppointmentsMap.get(doctor);
+    }
+    public Collection<Appointment> getPatientAppointments(Patient patient) {
+        return patientAppointmentsMap.get(patient);
     }
 
     //updateAdd
@@ -84,35 +91,48 @@ public class Agenda {
     }
 
     //helper methods
-    private void matchDoctorsAppointments(Set<User> users, Set<Appointment> appointments) {
+    private void matchUserAppointments(Set<User> users, Set<Appointment> appointments) {
         Iterator<User> iterator = users.iterator();
-        Set<Appointment> doctorAppointments;
         while (iterator.hasNext()) {
-            Doctor doctor = null;
             User user = iterator.next();
-            if (user instanceof Doctor) {
-                doctor = (Doctor) user;
+            if (user instanceof Doctor doctor) {
+                doctorAppointmentsMap.put(doctor, matchAppointments(doctor, appointments));
             }
-            if (doctor != null) {
-                doctorAppointments = matchAppointments(doctor, appointments);
-                doctorAppointmentsMap.put(doctor, doctorAppointments);
+            if (user instanceof Patient patient) {
+                patientAppointmentsMap.put(patient, matchAppointments(patient, appointments));
             }
         }
     }
 
-    private Set<Appointment> matchAppointments(Doctor doctor, Set<Appointment> allAppointments) {
-        Set<Appointment> doctorAppointments = new TreeSet<>();
+    private Set<Appointment> matchAppointments(User user, Set<Appointment> allAppointments) {
+        Set<Appointment> userAppointments = new TreeSet<>();
 
         Iterator<Appointment> iterator = allAppointments.iterator();
 
-        while (iterator.hasNext()) {
-            Appointment appointment = iterator.next();
-            if (appointment.getDoctorId() == doctor.getUserId()) {
-                doctorAppointments.add(appointment);
+        String userType = user.getClass().getSimpleName().toLowerCase();
+
+        switch (userType) {
+            case USER_DOCTOR -> {
+                Doctor doctor = (Doctor) user;
+                while (iterator.hasNext()) {
+                    Appointment appointment = iterator.next();
+                    if (appointment.getDoctorId() == doctor.getUserId()) {
+                        userAppointments.add(appointment);
+                    }
+                }
+            }
+            case USER_PATIENT -> {
+                Patient patient = (Patient) user;
+                while (iterator.hasNext()) {
+                    Appointment appointment = iterator.next();
+                    if (appointment.getPatientId() == patient.getUserId()) {
+                        userAppointments.add(appointment);
+                    }
+                }
             }
         }
 
-        return doctorAppointments;
+        return userAppointments;
     }
 
     private void refreshMap(Doctor doctor, Set<Appointment> appointments) {

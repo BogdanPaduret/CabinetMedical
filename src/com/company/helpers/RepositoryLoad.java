@@ -13,6 +13,8 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static com.company.helpers.Constants.*;
+
 public final class RepositoryLoad<T> {
 
     //instance variables
@@ -41,8 +43,8 @@ public final class RepositoryLoad<T> {
 
     public static boolean checkDoctorAndPatientId(int doctorId, int patientId) {
 
-        Set<User> users = userRepository.getAll("doctor");
-        users.addAll(userRepository.getAll("patient"));
+        Set<User> users = userRepository.getAll(USER_DOCTOR);
+        users.addAll(userRepository.getAll(USER_PATIENT));
 
         boolean existsDoctor = false;
         boolean existsPatient = false;

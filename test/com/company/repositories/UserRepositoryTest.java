@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static com.company.helpers.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserRepositoryTest {
@@ -54,9 +55,9 @@ class UserRepositoryTest {
         assertEquals(show + "Doctor ID: 6\n" +
                         "Doctor Name: Doctorescu Matei\n",
                 ur.show());
-        Set<User> userTypeSet = ur.getAll("doctor");
+        Set<User> userTypeSet = ur.getAll(USER_DOCTOR);
         assertEquals(4, userTypeSet.size());
-        userTypeSet = ur.getAll("patient");
+        userTypeSet = ur.getAll(USER_PATIENT);
         assertEquals(3, userTypeSet.size());
     }
 
