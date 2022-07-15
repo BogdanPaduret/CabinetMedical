@@ -1,5 +1,7 @@
 package com.company.views;
 
+import com.company.exceptions.AppointmentDoesNotExistException;
+import com.company.exceptions.AppointmentFailedException;
 import com.company.helpers.RepositoryLoad;
 import com.company.helpers.Utils;
 import com.company.models.*;
@@ -11,26 +13,24 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.company.helpers.Utils.getScanner;
+import static com.company.helpers.Utils.parseInteger;
 
 public class DoctorView implements View {
 
     //instance variables
     private Doctor doctor;
-    private Set<Appointment> appointments;
-    private Set<Patient> patients;
 
     //constructor
     public DoctorView(Doctor doctor) {
         this.doctor = doctor;
-        Agenda agenda = new Agenda(RepositoryLoad.userRepository.getPath(), RepositoryLoad.appointmentRepository.getPath());
-        appointments.addAll(agenda.getDoctorAppointments(doctor));
     }
 
     //menu
     private void menu() {
         String string = "";
 
-        string += "Logat ca doctor " + doctor.getUserName();
+        string += "\n=== MOD DOCTOR ===";
+        string += "\nSunteti logat ca doctor " + doctor.getUserName().toUpperCase();
         string += "\nApasati 1 pentru a vedea programarile";
         string += "\nApasati 2 pentru a inchide o programare";
         string += "\nApasati 0 pentru a iesi";
@@ -61,7 +61,18 @@ public class DoctorView implements View {
                 default -> {}
                 case 0 -> running = !Utils.exitAskSave(scanner, changedRepositories.toArray(new Repository<?>[0]));
                 case 1 -> showDoctorAppointments();
-                case 2 -> closeAppointment();
+                case 2 -> {
+                    try {
+                        closeAppointment(scanner);
+                    } catch (AppointmentFailedException e) {
+                        e.printStackTrace();
+                        System.out.println(
+                                "Programarea nu a putut fi inchisa." +
+                                        "\nVerificati daca datele introduse sunt corecte."
+                        );
+                    }
+
+                }
             }
         }
     }
@@ -69,55 +80,39 @@ public class DoctorView implements View {
     //helper methods
 
     private void showDoctorAppointments() {
-        Iterator<Appointment> iterator = appointments.iterator();
-        while (iterator.hasNext()) {
-            Appointment appointment = iterator.next();
-            System.out.println(doctorAppointmentString(appointment));
-        }
-    }
-
-    private void closeAppointment() {
-
-    }
-
-    private Patient getPatient(int id) {
-        Iterator<Patient> iterator = patients.iterator();
-        while (iterator.hasNext()) {
-            Patient patient = iterator.next();
-            if (patient.getUserId() == id) {
-                return patient;
+        Agenda agenda = new Agenda(RepositoryLoad.userRepository.getPath(), RepositoryLoad.appointmentRepository.getPath());
+        try {
+            List<Appointment> appointments = new ArrayList<>();
+            appointments.addAll(agenda.getDoctorAppointments(doctor));
+            int size = appointments.size();
+            if (size > 0) {
+                System.out.println("Programarile doctorului "+doctor.getUserName().toUpperCase()+" sunt:\n");
+                for (Appointment appointment : appointments) {
+                    System.out.println(doctorAppointmentString(appointment));
+                }
+            } else {
+                System.out.println("Doctorul " + doctor.getUserName() + " nu are nicio programare");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        throw new NoSuchElementException("Patient with ID: " + id + " does not exist");
     }
 
-    //cod duplicat pentru durata programarii
+    private void closeAppointment(Scanner scanner) {
+        System.out.println("Introduceti ID-ul programarii");
+        int appointmentId = Utils.parseInteger(scanner.nextLine(), -1);
+        if (appointmentId > -1) {
+            RepositoryLoad.appointmentRepository.remove(RepositoryLoad.appointmentRepository.get(appointmentId));
+        } else {
+            throw new AppointmentDoesNotExistException();
+        }
+    }
+
     private String doctorAppointmentString(Appointment appointment) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy HH:mm a");
-
-        Duration duration = appointment.getDuration();
-        int days = (int) duration.toDays();
-
-        duration = duration.minusDays(days);
-        int hours = (int) duration.toHours();
-
-        duration = duration.minusHours(hours);
-        int minutes = (int) duration.toMinutes();
-
         String string = "";
-        string += "\nAppointment with patient " + getPatient(appointment.getPatientId()).getUserName() + ":";
-        string += "\nStarts on " + appointment.getStartDate().format(formatter);
-        string += "\nEnds on " + appointment.getEndDate().format(formatter);
-        string += "\nDuration:";
-        if (days != 0) {
-            string += " " + days + " days";
-        }
-        if (hours != 0) {
-            string += " " + hours + " hours";
-        }
-        if (minutes != 0) {
-            string += " " + minutes + " minutes";
-        }
+        string += "Appointment #" + appointment.getAppointmentId();
+        string += "\n" + RepositoryLoad.userRepository.get(appointment.getPatientId());
+        string += Utils.toStringAppointmentDates(appointment);
 
         return string;
     }

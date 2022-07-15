@@ -2,7 +2,6 @@ package com.company.views;
 
 import com.company.exceptions.AppointmentDoesNotExistException;
 import com.company.exceptions.AppointmentFailedException;
-import com.company.exceptions.DoctorDoesNotExistException;
 import com.company.helpers.RepositoryLoad;
 import com.company.helpers.Utils;
 import com.company.models.Agenda;
@@ -13,7 +12,6 @@ import com.company.repositories.Repository;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static com.company.helpers.Constants.*;
@@ -30,8 +28,8 @@ public class SecretaryView implements View {
     public void menu() {
         String string = "";
 
-        string += "=== MOD SECRETAR ===";
-        string += "\nSunteti logat ca " + secretary.getUserName();
+        string += "\n=== MOD SECRETAR ===";
+        string += "\nSunteti logat ca " + secretary.getUserName().toUpperCase();
         string += "\nApasati 1 pentru a crea o programare";
         string += "\nApasati 2 pentru a anula o programare";
         string += "\nApasati 3 pentru a modifica o programare";
@@ -164,7 +162,7 @@ public class SecretaryView implements View {
         boolean isRemoved = false;
         System.out.println("Introduceti numele doctorului sau ID-ul programarii");
         String input = scanner.nextLine();
-        int appointmentId = parseInteger(input, -1);
+        int appointmentId = Utils.parseInteger(input, -1);
         String successfulCancel = "Programarea a fost anulata cu succes";
 
         if (appointmentId == -1) {
@@ -218,7 +216,7 @@ public class SecretaryView implements View {
 
     private void modifyAppointment(Scanner scanner) {
         System.out.println("Introduceti ID-ul programarii");
-        int appointmentId = parseInteger(scanner.nextLine(), -1);
+        int appointmentId = Utils.parseInteger(scanner.nextLine(), -1);
 
         if (appointmentId != -1) {
             modifyAppointment(appointmentId,scanner);
@@ -245,7 +243,7 @@ public class SecretaryView implements View {
         String[] input = scanner.nextLine().split(STRING_SEPARATOR);
         int[] inputArray = new int[input.length];
         for (int i = 0; i < input.length; i++) {
-            inputArray[i] = parseInteger(input[i], valOnException);
+            inputArray[i] = Utils.parseInteger(input[i], valOnException);
         }
         return inputArray;
     }
@@ -261,14 +259,6 @@ public class SecretaryView implements View {
             r = 0;
         }
         return r;
-    }
-
-    private int parseInteger(String string, int valueOnException) {
-        try {
-            return Integer.parseInt(string);
-        } catch (NumberFormatException e) {
-            return valueOnException;
-        }
     }
 
 }

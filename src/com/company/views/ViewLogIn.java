@@ -36,7 +36,7 @@ public class ViewLogIn implements View {
         String string = "";
 
         if (user != null) {
-            string += "\nLogat ca: " + user.getUserName();
+            string += "\nSunteti logat ca: " + user.getUserName().toUpperCase();
             string += "\nApasati 1 pentru a schimba utilizatorul";
         } else {
             string += "\nApasati 1 pentru a va loga";

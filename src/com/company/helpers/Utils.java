@@ -6,7 +6,9 @@ import com.company.models.*;
 import com.company.repositories.Observed;
 import com.company.repositories.Repository;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.company.helpers.Constants.*;
@@ -55,8 +57,34 @@ public final class Utils {
 
     }
 
-    public static void updateAppointment(int id, Appointment appointment) {
+    public static String toStringAppointmentDates(Appointment appointment) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy HH:mm a");
 
+        Duration duration = appointment.getDuration();
+        int days = (int) duration.toDays();
+
+        duration = duration.minusDays(days);
+        int hours = (int) duration.toHours();
+
+        duration = duration.minusHours(hours);
+        int minutes = (int) duration.toMinutes();
+
+        String string = "";
+
+        string += "\nStarts on " + appointment.getStartDate().format(formatter);
+        string += "\nEnds on " + appointment.getEndDate().format(formatter);
+        string += "\nDuration:";
+        if (days != 0) {
+            string += " " + days + " days";
+        }
+        if (hours != 0) {
+            string += " " + hours + " hours";
+        }
+        if (minutes != 0) {
+            string += " " + minutes + " minutes";
+        }
+
+        return string;
     }
 
     //misc
@@ -90,7 +118,12 @@ public final class Utils {
     }
 
     public static boolean exit(Scanner scanner) {
-        System.out.println("Sigur iesiti din aplicatie?");
+        System.out.println("""
+                Sigur iesiti din aplicatie?
+                 - Y / Yes  / y / yes   : pentru a iesi din modul curent.
+                 - Q / Quit / q / quit  : pentru a inchide complet programul. Nu se salveaza.
+                 - N / No   / n / no    : pentru a ramane in modul curent.
+                """);
         char ans = scanner.nextLine().toLowerCase().charAt(0);
         if (ans == 'y') {
             return true;
@@ -143,6 +176,14 @@ public final class Utils {
             repositories.remove((Repository<?>) observed);
         } catch (ClassCastException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static int parseInteger(String string, int valueOnException) {
+        try {
+            return Integer.parseInt(string);
+        } catch (NumberFormatException e) {
+            return valueOnException;
         }
     }
 }

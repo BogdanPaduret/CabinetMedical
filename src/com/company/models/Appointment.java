@@ -1,5 +1,7 @@
 package com.company.models;
 
+import com.company.helpers.Utils;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -149,31 +151,9 @@ public class Appointment implements Serializable, Comparable<Appointment> {
 
     @Override
     public String toString() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMM dd, yyyy HH:mm a");
-
-        Duration duration = getDuration();
-        int days = (int) duration.toDays();
-
-        duration = duration.minusDays(days);
-        int hours = (int) duration.toHours();
-
-        duration = duration.minusHours(hours);
-        int minutes = (int) duration.toMinutes();
-
         String string = "Appointment #"+appointmentId;
         string += "\nAppointment of patient with ID " + patientId + " with doctor with ID " + doctorId + ":";
-        string += "\nStarts on " + startDate.format(formatter);
-        string += "\nEnds on " + endDate.format(formatter);
-        string += "\nDuration:";
-        if (days != 0) {
-            string += " " + days + " days";
-        }
-        if (hours != 0) {
-            string += " " + hours + " hours";
-        }
-        if (minutes != 0) {
-            string += " " + minutes + " minutes";
-        }
+        string += Utils.toStringAppointmentDates(this);
 
         return string;
     }
